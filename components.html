@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Dossiers - C.I.A. Division</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="cia-theme.css">
+</head>
+<body class="antialiased">
+
+    <header class="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-700">
+        <nav class="container mx-auto px-4 lg:px-6 py-3 flex justify-between items-center">
+            <a href="index.html" class="text-2xl font-bold accent-color font-mono">C.I.A. <span class="text-white hidden sm:inline">Division</span></a>
+            <div class="hidden lg:flex items-center space-x-6">
+                <a href="components.html" class="nav-link active">Equipment</a>
+                <a href="build-process.html" class="nav-link">Assembly</a>
+                <a href="cooling.html" class="nav-link">Thermals</a>
+                <a href="optimization.html" class="nav-link">Calibration</a>
+                <a href="build-guides.html" class="nav-link">Loadouts</a>
+                <a href="quiz.html" class="nav-link">Assessment</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8">
+        <section class="text-center my-12">
+            <h1 class="text-4xl md:text-5xl font-bold tracking-tight font-mono">Equipment Dossiers</h1>
+            <p class="text-lg text-gray-400 mt-4 max-w-3xl mx-auto">Deconstruction of primary hardware components. Select a file for detailed analysis.</p>
+        </section>
+
+        <div class="space-y-12">
+            <div class="card rounded-lg p-6" data-modal="cpu"><h3 class="text-2xl font-bold accent-color mb-2 font-mono">File: CPU</h3><p class="text-gray-400">Central Processing Unit. The primary command and control center of the system.</p></div>
+            <div class="card rounded-lg p-6" data-modal="gpu"><h3 class="text-2xl font-bold accent-color mb-2 font-mono">File: GPU</h3><p class="text-gray-400">Graphics Processing Unit. Specialized processor for visual data and parallel computing tasks.</p></div>
+            <div class="card rounded-lg p-6" data-modal="ram"><h3 class="text-2xl font-bold accent-color mb-2 font-mono">File: RAM</h3><p class="text-gray-400">Random Access Memory. High-speed volatile memory for active mission data.</p></div>
+            <div class="card rounded-lg p-6" data-modal="storage"><h3 class="text-xl font-bold accent-color mb-2 font-mono">File: Storage</h3><p class="text-gray-400">Non-volatile data storage. Permanent repository for operating system and intelligence files.</p></div>
+            <div class="card rounded-lg p-6" data-modal="motherboard"><h3 class="text-xl font-bold accent-color mb-2 font-mono">File: Motherboard</h3><p class="text-gray-400">Primary communications backplane. Connects all system components.</p></div>
+            <div class="card rounded-lg p-6" data-modal="psu"><h3 class="text-xl font-bold accent-color mb-2 font-mono">File: PSU & Chassis</h3><p class="text-gray-400">Power Supply Unit and structural housing. Provides operational power and physical security.</p></div>
+        </div>
+    </main>
+
+    <div id="modal-container"></div>
+
+    <footer class="bg-black border-t border-gray-700 mt-16">
+        <div class="container mx-auto p-6 text-center text-gray-500 font-mono">
+            <p>Central Intelligence Agency - Directorate of Science & Technology</p>
+        </div>
+    </footer>
+
+    <script src="cia-shared.js"></script>
+</body>
+</html>
