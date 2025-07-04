@@ -3,25 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S.C.P. Division - Systems Construction Protocol</title>
+    <title>C.I.A. Division - Computer Integration & Assembly</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="scp-theme.css">
+    <link rel="stylesheet" href="cia-theme.css">
 </head>
 <body class="antialiased">
 
-    <!-- SCP Intro Animation -->
-    <div id="scp-intro" class="fixed top-0 left-0 w-full h-full bg-black flex justify-center items-center z-[100]">
-        <div class="text-center text-white font-mono">
-            <div id="logo-container" class="w-32 h-32 mx-auto mb-8 border-4 border-white rounded-full flex justify-center items-center relative">
-                <div class="w-4 h-4 bg-white absolute top-1/2 left-[-8px] -translate-y-1/2"></div>
-                <div class="w-4 h-4 bg-white absolute top-1/2 right-[-8px] -translate-y-1/2"></div>
-                <div class="w-4 h-4 bg-white absolute top-[-8px] left-1/2 -translate-x-1/2"></div>
-                <div class="text-4xl font-bold">SCP</div>
-            </div>
-            <h1 id="intro-title" class="text-2xl md:text-4xl tracking-widest">[ACCESSING SECURE DATABASE]</h1>
-            <p id="intro-subtitle" class="text-lg text-red-500 mt-2">[SYSTEMS CONSTRUCTION PROTOCOL]</p>
-            <div id="progress-bar-container" class="w-full max-w-md mx-auto mt-8 bg-gray-700 h-2">
-                <div id="progress-bar" class="bg-white h-2" style="width: 0%;"></div>
+    <!-- CIA Intro Animation -->
+    <div id="cia-intro" class="fixed top-0 left-0 w-full h-full bg-black flex justify-center items-center z-[100] font-mono p-4">
+        <div class="w-full max-w-2xl text-left">
+            <div id="intro-text-container" class="text-green-400 text-lg">
+                <p>> <span class="typing"></span></p>
             </div>
         </div>
     </div>
@@ -29,56 +21,56 @@
     <div id="main-content" class="opacity-0">
         <header class="bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50 border-b border-gray-700">
             <nav class="container mx-auto px-4 lg:px-6 py-3 flex justify-between items-center">
-                <a href="index.html" class="text-2xl font-bold accent-color font-mono">S.C.P. <span class="text-white hidden sm:inline">Division</span></a>
+                <a href="index.html" class="text-2xl font-bold accent-color font-mono">C.I.A. <span class="text-white hidden sm:inline">Division</span></a>
                 <div class="hidden lg:flex items-center space-x-6">
-                    <a href="components.html" class="nav-link">Components</a>
+                    <a href="components.html" class="nav-link">Equipment</a>
                     <a href="build-process.html" class="nav-link">Assembly</a>
                     <a href="cooling.html" class="nav-link">Thermals</a>
-                    <a href="optimization.html" class="nav-link">Tuning</a>
-                    <a href="build-guides.html" class="nav-link">Build Files</a>
-                    <a href="quiz.html" class="nav-link">Evaluation</a>
+                    <a href="optimization.html" class="nav-link">Calibration</a>
+                    <a href="build-guides.html" class="nav-link">Loadouts</a>
+                    <a href="quiz.html" class="nav-link">Assessment</a>
                 </div>
             </nav>
         </header>
 
         <main class="container mx-auto p-4 md:p-8">
             <section class="animated-banner text-center my-8">
-                <h1 class="text-4xl md:text-6xl font-bold tracking-tight z-10 relative font-mono">Systems Construction Protocol</h1>
-                <p class="text-lg md:text-xl text-gray-400 mt-4 max-w-3xl mx-auto z-10 relative">An interactive deep dive into high-performance computing architecture, assembly, and optimization.</p>
+                <h1 class="text-4xl md:text-6xl font-bold tracking-tight z-10 relative font-mono">Computer Integration & Assembly</h1>
+                <p class="text-lg md:text-xl text-gray-400 mt-4 max-w-3xl mx-auto z-10 relative">Field guide for the construction and optimization of high-performance tactical computing systems.</p>
             </section>
 
             <section class="my-16">
-                <h2 class="text-3xl font-bold text-center mb-10 font-mono">Access Guide Sections</h2>
+                <h2 class="text-3xl font-bold text-center mb-10 font-mono">Access Mission Briefings</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     
                     <a href="components.html" class="card rounded-lg p-6 group">
-                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Item-001: Components</h3>
-                        <p class="text-gray-400">Analysis of anomalous properties of core hardware components. Understanding their function is critical to containment.</p>
+                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Dossier: Equipment</h3>
+                        <p class="text-gray-400">Detailed analysis of core hardware components. Understanding equipment capabilities is paramount to mission success.</p>
                     </a>
 
                     <a href="build-process.html" class="card rounded-lg p-6 group">
-                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Item-002: Assembly</h3>
-                        <p class="text-gray-400">Step-by-step procedure for physical construction. Deviation from protocol may result in catastrophic system failure.</p>
+                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Protocol: Assembly</h3>
+                        <p class="text-gray-400">Standard Operating Procedure for system construction. Deviation from protocol is grounds for mission failure.</p>
                     </a>
 
                     <a href="cooling.html" class="card rounded-lg p-6 group">
-                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Item-003: Thermals</h3>
-                        <p class="text-gray-400">Containment of thermal energy. Analysis of airflow dynamics and heat dissipation to prevent meltdown scenarios.</p>
+                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Directive: Thermals</h3>
+                        <p class="text-gray-400">Management of thermal signatures and heat dissipation. Maintaining low temperatures is critical for stealth and system longevity.</p>
                     </a>
 
                     <a href="optimization.html" class="card rounded-lg p-6 group">
-                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Item-004: Tuning</h3>
-                        <p class="text-gray-400">Post-construction system calibration. Firmware and software adjustments for peak operational efficiency.</p>
+                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Directive: Calibration</h3>
+                        <p class="text-gray-400">Post-assembly system tuning. Firmware and software adjustments for peak operational performance in the field.</p>
                     </a>
 
                     <a href="build-guides.html" class="card rounded-lg p-6 group">
-                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Item-005: Build Files</h3>
-                        <p class="text-gray-400">Archived schematics for pre-approved system configurations, from field units to high-threat containment servers.</p>
+                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Dossier: Approved Loadouts</h3>
+                        <p class="text-gray-400">Pre-approved system configurations for various mission profiles, from reconnaissance to direct action.</p>
                     </a>
 
                     <a href="quiz.html" class="card rounded-lg p-6 group">
-                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Item-006: Evaluation</h3>
-                        <p class="text-gray-400">Mandatory personnel knowledge assessment. Failure to meet standards will result in disciplinary action.</p>
+                        <h3 class="text-2xl font-bold accent-color mb-2 font-mono">Directive: Competency Assessment</h3>
+                        <p class="text-gray-400">Mandatory knowledge evaluation for all field agents. Your results will be recorded in your permanent file.</p>
                     </a>
 
                 </div>
@@ -87,11 +79,11 @@
 
         <footer class="bg-black border-t border-gray-700 mt-16">
             <div class="container mx-auto p-6 text-center text-gray-500 font-mono">
-                <p>Secure. Contain. Protect.</p>
+                <p>Central Intelligence Agency - Directorate of Science & Technology</p>
             </div>
         </footer>
     </div>
 
-    <script src="scp-shared.js"></script>
+    <script src="cia-shared.js"></script>
 </body>
 </html>
