@@ -16,6 +16,11 @@
             --terminal-red: #ff0033;
             --text-color: #e0e0e0;
             --border-color: rgba(0, 255, 65, 0.3);
+            --scrollbar-thumb: var(--terminal-green);
+            --scrollbar-thumb-hover: var(--terminal-cyan);
+            --diagram-stroke: var(--terminal-cyan);
+            --diagram-fill: var(--terminal-green);
+            --diagram-text: var(--text-color);
         }
 
         body {
@@ -23,6 +28,7 @@
             font-family: 'Fira Code', monospace;
             color: var(--text-color);
             overflow-x: hidden;
+            transition: background-color 0.5s, color 0.5s;
         }
 
         .terminal-glow {
@@ -42,7 +48,7 @@
             bottom: 0;
             right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
+            z-index: 100;
             background-size: 100% 2px, 3px 100%;
             pointer-events: none;
             animation: scanline-anim 15s linear infinite;
@@ -90,13 +96,13 @@
             box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
         }
         
-        .component-card {
+        .component-card, .upgrade-card {
             border: 1px solid var(--border-color);
             transition: all 0.3s ease;
             background-color: rgba(10, 20, 15, 0.3);
         }
 
-        .component-card:hover {
+        .component-card:hover, .upgrade-card:hover {
             border-color: var(--terminal-cyan);
             background-color: rgba(0, 255, 255, 0.05);
             transform: translateY(-5px);
@@ -120,20 +126,61 @@
             background: var(--main-bg);
         }
         ::-webkit-scrollbar-thumb {
-            background: var(--terminal-green);
+            background: var(--scrollbar-thumb);
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: var(--terminal-cyan);
+            background: var(--scrollbar-thumb-hover);
+        }
+
+        .data-bar {
+            background-color: var(--terminal-green);
+            animation: data-bar-anim 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes data-bar-anim {
+            from { width: 10%; }
+            to { width: 100%; }
+        }
+        
+        .quiz-option.correct { background-color: #00ff41 !important; color: #0a0a0a !important; }
+        .quiz-option.incorrect { background-color: #ff0033 !important; color: #e0e0e0 !important; }
+        .quiz-option:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        .diagram-container {
+            border: 1px solid var(--border-color);
+            background-color: rgba(0,0,0,0.2);
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0.5rem;
         }
     </style>
 </head>
 <body class="crt-scanlines">
 
     <!-- Log-on Screen -->
-    <div id="logon-screen" class="fixed inset-0 bg-black z-50 flex items-center justify-center p-4">
+    <div id="logon-screen" class="fixed inset-0 bg-black z-50 flex items-center justify-center p-4 overflow-hidden">
         <div class="w-full max-w-4xl font-mono text-sm sm:text-base">
-            <div id="logon-content" class="text-green-400"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div id="logon-content" class="text-green-400 md:col-span-2"></div>
+                <div id="logon-graphics" class="hidden md:block text-green-400 text-xs">
+                    <p>// SYSTEM LOAD VISUALIZATION //</p>
+                    <div class="space-y-1 mt-2">
+                        <div class="flex items-center gap-2">CPU Core 0: <div class="w-full bg-gray-800 h-2"><div class="data-bar h-2" style="animation-duration: 1.5s;"></div></div></div>
+                        <div class="flex items-center gap-2">CPU Core 1: <div class="w-full bg-gray-800 h-2"><div class="data-bar h-2" style="animation-duration: 2.1s;"></div></div></div>
+                        <div class="flex items-center gap-2">MEM_CTRL:   <div class="w-full bg-gray-800 h-2"><div class="data-bar h-2" style="animation-duration: 1.8s;"></div></div></div>
+                        <div class="flex items-center gap-2">NVLINK_BUS: <div class="w-full bg-gray-800 h-2"><div class="data-bar h-2" style="animation-duration: 2.5s;"></div></div></div>
+                    </div>
+                    <pre id="logon-ascii" class="mt-4 text-center terminal-glow opacity-0 transition-opacity duration-1000">
+  ___
+ / _ \
+| | | |_ __   ___
+| | | | '_ \ / _ \
+| |_| | | | |  __/
+ \___/|_| |_|\___|
+                    </pre>
+                </div>
+            </div>
             <div id="progress-container" class="mt-4 w-full bg-gray-800 border border-green-700 rounded-sm h-6 p-1 hidden">
                 <div id="progress-bar" class="progress-bar-inner h-full rounded-sm" style="width: 0%;"></div>
             </div>
@@ -143,7 +190,7 @@
 
     <!-- Main Content -->
     <div id="main-content" class="hidden">
-        <header class="p-4 bg-black/50 backdrop-blur-sm sticky top-0 z-40 border-b border-gray-800">
+        <header class="p-4 bg-black/50 backdrop-blur-sm sticky top-0 z-40 border-b border-[var(--border-color)]">
             <div class="container mx-auto flex justify-between items-center">
                 <h1 class="text-2xl font-bold terminal-glow-cyan">[PROJECT_TERMINUS]</h1>
                 <nav id="main-nav" class="hidden md:flex space-x-2">
@@ -221,8 +268,33 @@
             <section id="upgrades" class="tab-content hidden">
                  <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
                     <h2 class="text-3xl font-bold terminal-glow mb-4">> UPGRADE_PATHWAYS</h2>
-                    <p class="text-yellow-400">> STATUS: Module under construction. Data stream pending.</p>
-                    <p>This section will provide detailed guides on upgrading individual components, identifying bottlenecks, and planning a cost-effective upgrade path for your system.</p>
+                    <p class="mb-4">Upgrading a PC is a strategic process. The goal is to alleviate the most significant bottleneck for your primary workload to achieve the most noticeable performance gain for your investment.</p>
+                    
+                    <div class="upgrade-card p-4 rounded-lg mb-6">
+                        <h3 class="text-xl font-bold text-cyan-400 mb-2">> Step 1: Identify Your Bottleneck</h3>
+                        <p>Before buying parts, determine what's holding your system back. Use monitoring software (like Windows Task Manager or MSI Afterburner's overlay) while running your primary application (e.g., a demanding game).</p>
+                        <ul class="list-disc list-inside mt-2 space-y-1">
+                            <li><strong class="text-green-400">GPU at 99-100% & CPU below 80%:</strong> You have a GPU bottleneck. This is ideal for most gaming PCs. Upgrading the GPU will yield the highest FPS gains.</li>
+                            <li><strong class="text-green-400">CPU at 99-100% (or one core maxed out) & GPU below 90%:</strong> You have a CPU bottleneck. Common in high-refresh-rate esports titles or productivity tasks. A CPU upgrade is needed.</li>
+                            <li><strong class="text-green-400">RAM usage high, stuttering occurs:</strong> You may have a RAM capacity bottleneck. Upgrading from 8GB to 16GB, or 16GB to 32GB, can improve smoothness.</li>
+                        </ul>
+                    </div>
+
+                    <h3 class="text-2xl font-bold terminal-glow mb-4">> Common Upgrade Paths</h3>
+                    <div class="space-y-4">
+                        <div class="upgrade-card p-4 rounded-lg">
+                            <h4 class="text-lg font-bold text-cyan-400">GPU Upgrade</h4>
+                            <p>The most common upgrade for gamers. <strong class="text-yellow-400">Check:</strong> Your PSU must have enough wattage and the correct PCIe power connectors. Your case must have enough physical length clearance.</p>
+                        </div>
+                        <div class="upgrade-card p-4 rounded-lg">
+                            <h4 class="text-lg font-bold text-cyan-400">CPU Upgrade</h4>
+                            <p>Can provide a significant boost in CPU-heavy games and productivity. <strong class="text-yellow-400">Check:</strong> The new CPU must be compatible with your motherboard's socket and chipset. A BIOS update is often required. Ensure your CPU cooler can handle the new chip's TDP.</p>
+                        </div>
+                         <div class="upgrade-card p-4 rounded-lg">
+                            <h4 class="text-lg font-bold text-cyan-400">Storage Upgrade</h4>
+                            <p>Moving from an HDD to any SSD is the single most impactful upgrade for overall system responsiveness. <strong class="text-yellow-400">Check:</strong> Ensure your motherboard has a free M.2 slot for an NVMe drive or a SATA port for a 2.5" SSD.</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -230,15 +302,15 @@
             <section id="quizzes" class="tab-content hidden">
                 <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
                     <h2 class="text-3xl font-bold terminal-glow mb-4">> KNOWLEDGE_ASSESSMENT</h2>
-                    <p class="text-yellow-400">> STATUS: Module under construction. Data stream pending.</p>
-                     <div class="mt-4">
-                        <p class="font-bold text-cyan-400 mb-2">Sample Question:</p>
-                        <p>Which component is most critical for high-resolution (4K) gaming performance?</p>
-                        <div class="flex flex-col space-y-2 mt-2">
-                            <button class="text-left p-2 border border-gray-600 rounded hover:bg-green-900">A) CPU</button>
-                            <button class="text-left p-2 border border-gray-600 rounded hover:bg-green-900">B) RAM</button>
-                            <button class="text-left p-2 border border-gray-600 rounded hover:bg-green-900">C) GPU</button>
-                            <button class="text-left p-2 border border-gray-600 rounded hover:bg-green-900">D) PSU</button>
+                    <div id="quiz-container">
+                        <div id="quiz-question-container">
+                            <p id="quiz-question" class="text-lg text-cyan-400 mb-4"></p>
+                            <div id="quiz-options" class="flex flex-col space-y-2 mt-2"></div>
+                        </div>
+                        <div id="quiz-result-container" class="hidden">
+                            <p id="quiz-score" class="text-2xl terminal-glow-cyan"></p>
+                            <p id="quiz-feedback" class="mt-2"></p>
+                            <button id="quiz-restart-btn" class="mt-4 nav-item px-4 py-2 rounded-md">Restart Assessment</button>
                         </div>
                     </div>
                 </div>
@@ -257,19 +329,22 @@
             <section id="settings" class="tab-content hidden">
                  <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
                     <h2 class="text-3xl font-bold terminal-glow mb-4">> INTERFACE_SETTINGS</h2>
-                    <p class="text-yellow-400">> STATUS: Module under construction. Data stream pending.</p>
                     <div class="mt-4 space-y-4">
                         <div>
                             <label for="theme-select" class="block mb-2 text-cyan-400">Color Scheme:</label>
                             <select id="theme-select" class="bg-gray-800 border border-gray-600 rounded p-2 w-full md:w-1/3">
-                                <option>Terminal Green (Default)</option>
-                                <option disabled>Amber</option>
-                                <option disabled>Arctic Blue</option>
+                                <option value="green">Terminal Green (Default)</option>
+                                <option value="amber">Scorched Amber</option>
+                                <option value="blue">Arctic Blue</option>
+                                <option value="red">Red Alert</option>
+                                <option value="sakura">Sakura Blossom</option>
+                                <option value="pastel">Pastel Dream</option>
+                                <option value="oceanic">Oceanic Deep</option>
                             </select>
                         </div>
                          <div>
-                            <label class="flex items-center space-x-2 text-cyan-400">
-                                <input type="checkbox" class="form-checkbox bg-gray-800 border-gray-600 text-green-500" checked>
+                            <label class="flex items-center space-x-2 text-cyan-400 cursor-pointer">
+                                <input type="checkbox" id="scanlines-toggle" class="form-checkbox bg-gray-800 border-gray-600 text-green-500" checked>
                                 <span>Enable Scanlines Effect</span>
                             </label>
                         </div>
@@ -301,19 +376,24 @@
             const logonStatus = document.getElementById('logon-status');
             const mainContent = document.getElementById('main-content');
             const logonScreen = document.getElementById('logon-screen');
+            const logonAscii = document.getElementById('logon-ascii');
+            const logonGraphics = document.getElementById('logon-graphics');
 
             const lines = [
                 { text: 'INITIALIZING SYSTEM...', delay: 100 },
-                { text: 'CONNECTING TO [PROJECT_TERMINUS] MAINFR...', delay: 1500, type: true },
+                { text: 'CONNECTING TO [PROJECT_TERMINUS] MAINFR...', delay: 1000, type: true },
                 { text: 'CONNECTION ESTABLISHED.', delay: 500 },
-                { text: 'BYPASSING SECURITY PROTOCOL... ALPHA-7', delay: 1000, type: true },
+                { text: 'simmieee simmiee ahhh', delay: 100, type: true, color: 'text-yellow-400 flicker' },
+                { text: 'BYPASSING SECURITY PROTOCOL... ALPHA-7', delay: 800, type: true },
                 { text: 'ACCESS GRANTED.', delay: 500 },
-                { text: 'LOADING KERNEL MODULES...', delay: 800, progress: 20 },
+                { text: 'Deploying sand worms to angel...', delay: 100, type: true, color: 'text-red-500' },
+                { text: 'LOADING KERNEL MODULES...', delay: 800, progress: 20, showGraphics: true },
                 { text: 'DECRYPTING DATA STREAMS...', delay: 1200, progress: 45 },
                 { text: 'Mi-Hwa is so gay, get a job Frenchie', delay: 100, type: true, color: 'text-red-500 flicker' },
                 { text: 'RUNNING DIAGNOSTICS...', delay: 1000, progress: 60 },
                 { text: 'SYSTEM CHECK: OK', delay: 300 },
                 { text: 'CACHE CHECK: OK', delay: 300 },
+                { text: 'revoking estrogen from mimi', delay: 100, type: true, color: 'text-cyan-400' },
                 { text: 'Mi-Hwa is a pretty boy', delay: 100, type: true, color: 'text-cyan-400' },
                 { text: 'LOADING USER INTERFACE...', delay: 1500, progress: 85 },
                 { text: 'FINALIZING HANDSHAKE...', delay: 1000, progress: 100 },
@@ -339,6 +419,11 @@
                     progressContainer.classList.remove('hidden');
                     progressBar.style.width = `${line.progress}%`;
                     logonStatus.textContent = line.text;
+                }
+                
+                if (line.showGraphics) {
+                    logonGraphics.classList.remove('hidden');
+                    logonAscii.style.opacity = '1';
                 }
 
                 const p = document.createElement('p');
@@ -370,44 +455,36 @@
             processLine();
 
             // --- Tab Navigation ---
-            const navButtons = document.querySelectorAll('#main-nav button, #mobile-menu button');
-            const tabs = document.querySelectorAll('.tab-content');
             const mainNav = document.getElementById('main-nav');
             const mobileMenu = document.getElementById('mobile-menu');
             const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             
-            // Clone nav items for mobile menu
             mainNav.querySelectorAll('button').forEach(btn => {
                 const clone = btn.cloneNode(true);
                 clone.classList.add('w-full', 'text-left');
                 mobileMenu.appendChild(clone);
             });
             
-            const allNavButtons = document.querySelectorAll('nav button, #mobile-menu button');
+            const allNavButtons = document.querySelectorAll('#main-nav button, #mobile-menu button');
+            const tabs = document.querySelectorAll('.tab-content');
 
             mobileMenuBtn.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
             });
 
             function switchTab(tabId) {
-                tabs.forEach(tab => {
-                    tab.classList.add('hidden');
-                });
+                tabs.forEach(tab => tab.classList.add('hidden'));
                 document.getElementById(tabId).classList.remove('hidden');
 
                 allNavButtons.forEach(btn => {
                     btn.classList.remove('active');
-                    if (btn.dataset.tab === tabId) {
-                        btn.classList.add('active');
-                    }
+                    if (btn.dataset.tab === tabId) btn.classList.add('active');
                 });
                 mobileMenu.classList.add('hidden');
             }
 
             allNavButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    switchTab(button.dataset.tab);
-                });
+                button.addEventListener('click', () => switchTab(button.dataset.tab));
             });
 
             // --- Component Data and Modal ---
@@ -418,116 +495,236 @@
             const modalCloseBtn = document.getElementById('modal-close-btn');
 
             const components = [
-                { id: 'cpu', name: 'CPU', desc: 'Central Processing Unit - The Brain', 
-                  details: `
-                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
-                    <p>Executes instructions from software and hardware. Its performance, governed by clock speed, core count, and IPC (Instructions Per Clock), dictates system responsiveness.</p>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
-                    <ul class="list-disc list-inside space-y-2">
-                        <li><strong class="text-green-400">Cores/Threads:</strong> More cores are better for multitasking and content creation. High thread counts improve efficiency.</li>
-                        <li><strong class="text-green-400">Clock Speed (GHz):</strong> Higher clock speed is crucial for single-threaded tasks like gaming.</li>
-                        <li><strong class="text-green-400">Cache (L3):</strong> A large L3 cache significantly boosts gaming performance by reducing latency to system RAM.</li>
-                    </ul>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> VENDORS: INTEL vs AMD</h3>
-                    <p><strong class="text-green-400">Intel:</strong> Traditionally strong single-threaded performance and high clock speeds. Hybrid architecture (P-cores/E-cores) optimizes performance and efficiency.</p>
-                    <p><strong class="text-green-400">AMD:</strong> Offers high core counts at competitive prices. 3D V-Cache technology gives a significant edge in gaming.</p>
-                  `
+                { 
+                    id: 'cpu', name: 'CPU', desc: 'Central Processing Unit - The Brain', 
+                    details: `
+                        <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                        <p>Executes instructions from software and hardware. Its performance, governed by clock speed, core count, and IPC (Instructions Per Clock), dictates system responsiveness.</p>
+                        <div class="diagram-container">
+                            <h4 class="text-lg font-bold text-cyan-400 mb-2 text-center">> CPU ANATOMY</h4>
+                            <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-sm mx-auto">
+                                <rect x="30" y="10" width="140" height="130" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <text x="100" y="25" font-size="10" fill="var(--diagram-text)" text-anchor="middle">IHS (Heat Spreader)</text>
+                                <rect x="50" y="40" width="100" height="90" fill="rgba(0,0,0,0.2)" stroke="var(--diagram-stroke)" stroke-dasharray="2"/>
+                                <text x="100" y="55" font-size="10" fill="var(--diagram-text)" text-anchor="middle">Silicon Die</text>
+                                <rect x="60" y="65" width="35" height="25" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
+                                <text x="77.5" y="80" font-size="8" fill="var(--diagram-text)" text-anchor="middle">Core 0</text>
+                                <rect x="105" y="65" width="35" height="25" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
+                                <text x="122.5" y="80" font-size="8" fill="var(--diagram-text)" text-anchor="middle">Core 1</text>
+                                <rect x="60" y="95" width="80" height="25" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <text x="100" y="110" font-size="8" fill="var(--diagram-text)" text-anchor="middle">L3 Cache</text>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong class="text-green-400">Cores/Threads:</strong> More cores are better for multitasking and content creation. High thread counts improve efficiency.</li>
+                            <li><strong class="text-green-400">Clock Speed (GHz):</strong> Higher clock speed is crucial for single-threaded tasks like gaming.</li>
+                            <li><strong class="text-green-400">Cache (L3):</strong> A large L3 cache significantly boosts gaming performance by reducing latency to system RAM.</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> VENDORS: INTEL vs AMD</h3>
+                        <p><strong class="text-green-400">Intel:</strong> Traditionally strong single-threaded performance and high clock speeds. Hybrid architecture (P-cores/E-cores) optimizes performance and efficiency.</p>
+                        <p><strong class="text-green-400">AMD:</strong> Offers high core counts at competitive prices. 3D V-Cache technology gives a significant edge in gaming.</p>`
                 },
-                { id: 'gpu', name: 'GPU', desc: 'Graphics Processing Unit - The Visual Powerhouse',
-                  details: `
-                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
-                    <p>A specialized processor for rendering images, video, and animations. Its massively parallel architecture makes it ideal for gaming and AI tasks.</p>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
-                    <ul class="list-disc list-inside space-y-2">
-                        <li><strong class="text-green-400">VRAM (Video RAM):</strong> Crucial for high resolutions and textures. 8GB is minimum for 1080p, 12-16GB for 1440p/4K.</li>
-                        <li><strong class="text-green-400">Core/Boost Clock:</strong> Higher speeds generally mean better performance.</li>
-                        <li><strong class="text-green-400">Specialized Cores:</strong> NVIDIA's RT Cores (Ray Tracing) and Tensor Cores (AI/DLSS) provide significant advantages in supported games.</li>
-                    </ul>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> VENDORS: NVIDIA vs AMD</h3>
-                    <p><strong class="text-green-400">NVIDIA:</strong> Market leader with superior ray tracing performance and the highly-regarded DLSS upscaling technology.</p>
-                    <p><strong class="text-green-400">AMD:</strong> Competes on price-to-performance, excelling in traditional rasterization. FSR is an open-source upscaling alternative.</p>
-                  `
+                { 
+                    id: 'gpu', name: 'GPU', desc: 'Graphics Processing Unit - The Visual Powerhouse',
+                    details: `
+                        <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                        <p>A specialized processor for rendering images, video, and animations. Its massively parallel architecture makes it ideal for gaming and AI tasks.</p>
+                        <div class="diagram-container">
+                            <h4 class="text-lg font-bold text-cyan-400 mb-2 text-center">> GPU LAYOUT</h4>
+                            <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-sm mx-auto">
+                                <rect x="10" y="10" width="180" height="100" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <text x="100" y="25" font-size="10" fill="var(--diagram-text)" text-anchor="middle">Cooling Shroud & Fans</text>
+                                <rect x="75" y="40" width="50" height="40" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
+                                <text x="100" y="65" font-size="8" fill="var(--diagram-text)" text-anchor="middle">GPU Die</text>
+                                <rect x="45" y="45" width="20" height="10" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <rect x="45" y="65" width="20" height="10" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <rect x="135" y="45" width="20" height="10" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <rect x="135" y="65" width="20" height="10" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <text x="55" y="35" font-size="8" fill="var(--diagram-text)" text-anchor="middle">VRAM</text>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong class="text-green-400">VRAM (Video RAM):</strong> Crucial for high resolutions and textures. 8GB is minimum for 1080p, 12-16GB for 1440p/4K.</li>
+                            <li><strong class="text-green-400">Core/Boost Clock:</strong> Higher speeds generally mean better performance.</li>
+                            <li><strong class="text-green-400">Specialized Cores:</strong> NVIDIA's RT Cores (Ray Tracing) and Tensor Cores (AI/DLSS) provide significant advantages in supported games.</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> VENDORS: NVIDIA vs AMD</h3>
+                        <p><strong class="text-green-400">NVIDIA:</strong> Market leader with superior ray tracing performance and the highly-regarded DLSS upscaling technology.</p>
+                        <p><strong class="text-green-400">AMD:</strong> Competes on price-to-performance, excelling in traditional rasterization. FSR is an open-source upscaling alternative.</p>`
                 },
-                { id: 'ram', name: 'RAM', desc: 'Random Access Memory - The Workspace',
-                  details: `
-                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
-                    <p>High-speed volatile memory that acts as a short-term workspace for the CPU. It holds the OS, active applications, and game data for quick access.</p>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
-                    <ul class="list-disc list-inside space-y-2">
-                        <li><strong class="text-green-400">Capacity (GB):</strong> 16GB is the sweet spot for gaming. 32GB+ is recommended for heavy multitasking and content creation.</li>
-                        <li><strong class="text-green-400">Speed (MT/s):</strong> Higher speed (e.g., DDR5-6000) provides more bandwidth for the CPU.</li>
-                        <li><strong class="text-green-400">Latency (CL):</strong> Lower CAS Latency is better. True latency is a balance of speed and CL.</li>
-                        <li><strong class="text-green-400">Channels:</strong> Always use two sticks for Dual-Channel mode to double memory bandwidth.</li>
-                    </ul>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> CONFIGURATION:</h3>
-                    <p>Always enable XMP (Intel) or EXPO (AMD) in the BIOS to run RAM at its advertised speed.</p>
-                  `
+                { 
+                    id: 'ram', name: 'RAM', desc: 'Random Access Memory - The Workspace',
+                    details: `
+                        <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                        <p>High-speed volatile memory that acts as a short-term workspace for the CPU. It holds the OS, active applications, and game data for quick access.</p>
+                        <div class="diagram-container">
+                            <h4 class="text-lg font-bold text-cyan-400 mb-2 text-center">> RAM MODULE (DIMM)</h4>
+                            <svg viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-sm mx-auto">
+                                <path d="M 10 10 H 190 V 40 H 10 Z" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <text x="100" y="20" font-size="8" fill="var(--diagram-text)" text-anchor="middle">Heat Spreader</text>
+                                <rect x="20" y="25" width="20" height="10" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
+                                <rect x="45" y="25" width="20" height="10" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
+                                <rect x="70" y="25" width="20" height="10" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
+                                <rect x="95" y="25" width="20" height="10" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
+                                <text x="67.5" y="50" font-size="8" fill="var(--diagram-text)" text-anchor="middle">Memory Chips</text>
+                                <path d="M 10 40 H 190" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <path d="M 95 40 V 45 H 105 V 40" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <text x="100" y="55" font-size="8" fill="var(--diagram-text)" text-anchor="middle">PCB & Connector</text>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong class="text-green-400">Capacity (GB):</strong> 16GB is the sweet spot for gaming. 32GB+ is recommended for heavy multitasking and content creation.</li>
+                            <li><strong class="text-green-400">Speed (MT/s):</strong> Higher speed (e.g., DDR5-6000) provides more bandwidth for the CPU.</li>
+                            <li><strong class="text-green-400">Latency (CL):</strong> Lower CAS Latency is better. True latency is a balance of speed and CL.</li>
+                            <li><strong class="text-green-400">Channels:</strong> Always use two sticks for Dual-Channel mode to double memory bandwidth.</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> CONFIGURATION:</h3>
+                        <p>Always enable XMP (Intel) or EXPO (AMD) in the BIOS to run RAM at its advertised speed.</p>`
                 },
-                { id: 'motherboard', name: 'Motherboard', desc: 'The Central Nervous System',
-                  details: `
-                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
-                    <p>The main circuit board connecting all components. Its chipset dictates compatibility and features like overclocking support, connectivity, and expansion.</p>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY FEATURES:</h3>
-                    <ul class="list-disc list-inside space-y-2">
-                        <li><strong class="text-green-400">Form Factor:</strong> ATX, Micro-ATX, Mini-ITX. Must match the case.</li>
-                        <li><strong class="text-green-400">CPU Socket & Chipset:</strong> Must be compatible with your chosen CPU (e.g., LGA 1700 for Intel 14th Gen, AM5 for AMD Ryzen 7000+).</li>
-                        <li><strong class="text-green-400">VRM (Voltage Regulator Module):</strong> A high-quality VRM is crucial for stable power delivery to high-end CPUs, especially when overclocking.</li>
-                        <li><strong class="text-green-400">Connectivity:</strong> Check for necessary PCIe slots, M.2 slots for NVMe SSDs, and rear I/O ports.</li>
-                    </ul>
-                  `
+                { 
+                    id: 'motherboard', name: 'Motherboard', desc: 'The Central Nervous System',
+                    details: `
+                        <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                        <p>The main circuit board connecting all components. Its chipset dictates compatibility and features like overclocking support, connectivity, and expansion.</p>
+                        <div class="diagram-container">
+                            <h4 class="text-lg font-bold text-cyan-400 mb-2 text-center">> MOTHERBOARD LAYOUT (SIMPLIFIED)</h4>
+                            <svg viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-sm mx-auto">
+                                <rect x="10" y="10" width="180" height="200" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <rect x="70" y="30" width="60" height="60" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <text x="100" y="65" font-size="8" fill="var(--diagram-text)" text-anchor="middle">CPU Socket</text>
+                                <rect x="140" y="30" width="20" height="70" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <rect x="165" y="30" width="20" height="70" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <text x="162.5" y="25" font-size="8" fill="var(--diagram-text)" text-anchor="middle">RAM Slots</text>
+                                <rect x="30" y="110" width="140" height="15" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
+                                <text x="100" y="120" font-size="8" fill="var(--diagram-text)" text-anchor="middle">PCIe x16 (GPU)</text>
+                                <rect x="30" y="135" width="80" height="10" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
+                                <text x="70" y="142" font-size="8" fill="var(--diagram-text)" text-anchor="middle">PCIe x1</text>
+                                <rect x="80" y="160" width="40" height="40" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <text x="100" y="185" font-size="8" fill="var(--diagram-text)" text-anchor="middle">Chipset</text>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY FEATURES:</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong class="text-green-400">Form Factor:</strong> ATX, Micro-ATX, Mini-ITX. Must match the case.</li>
+                            <li><strong class="text-green-400">CPU Socket & Chipset:</strong> Must be compatible with your chosen CPU (e.g., LGA 1700 for Intel 14th Gen, AM5 for AMD Ryzen 7000+).</li>
+                            <li><strong class="text-green-400">VRM (Voltage Regulator Module):</strong> A high-quality VRM is crucial for stable power delivery to high-end CPUs, especially when overclocking.</li>
+                            <li><strong class="text-green-400">Connectivity:</strong> Check for necessary PCIe slots, M.2 slots for NVMe SSDs, and rear I/O ports.</li>
+                        </ul>`
                 },
-                { id: 'psu', name: 'PSU', desc: 'Power Supply Unit - The Heart',
-                  details: `
-                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
-                    <p>Converts AC wall power to DC power for all PC components. A high-quality PSU is the most critical component for system stability and safety.</p>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
-                    <ul class="list-disc list-inside space-y-2">
-                        <li><strong class="text-green-400">Wattage:</strong> Must be sufficient for all components with 20-30% headroom for peaks and future upgrades. Use a PSU calculator.</li>
-                        <li><strong class="text-green-400">Efficiency (80 Plus):</strong> Gold or Bronze ratings offer the best balance of efficiency and cost, resulting in less wasted heat and electricity.</li>
-                        <li><strong class="text-green-400">Modularity:</strong> Fully-modular PSUs offer the easiest building experience and cleanest cable management.</li>
-                        <li><strong class="text-green-400">Protections:</strong> Ensure the PSU has a full suite of protections (OVP, OCP, SCP, etc.) to safeguard your components.</li>
-                    </ul>
-                    <p class="mt-4 text-red-500 flicker">> CRITICAL WARNING: A low-quality PSU is a system-wide liability. Do not cut costs here.</p>
-                  `
+                { 
+                    id: 'psu', name: 'PSU', desc: 'Power Supply Unit - The Heart',
+                    details: `
+                        <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                        <p>Converts AC wall power to DC power for all PC components. A high-quality PSU is the most critical component for system stability and safety.</p>
+                        <div class="diagram-container">
+                            <h4 class="text-lg font-bold text-cyan-400 mb-2 text-center">> PSU FEATURES</h4>
+                            <svg viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-sm mx-auto">
+                                <rect x="10" y="10" width="180" height="100" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <circle cx="100" cy="60" r="30" fill="none" stroke="var(--diagram-stroke)" stroke-width="1.5"/>
+                                <circle cx="100" cy="60" r="10" fill="var(--diagram-fill)" fill-opacity="0.5"/>
+                                <text x="100" y="25" font-size="10" fill="var(--diagram-text)" text-anchor="middle">Exhaust Fan</text>
+                                <rect x="15" y="70" width="25" height="15" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <rect x="15" y="90" width="25" height="15" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <text x="30" y="65" font-size="8" fill="var(--diagram-text)" text-anchor="middle">Modular Ports</text>
+                                <rect x="160" y="20" width="25" height="15" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <text x="172.5" y="45" font-size="8" fill="var(--diagram-text)" text-anchor="middle">AC Input</text>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong class="text-green-400">Wattage:</strong> Must be sufficient for all components with 20-30% headroom for peaks and future upgrades. Use a PSU calculator.</li>
+                            <li><strong class="text-green-400">Efficiency (80 Plus):</strong> Gold or Bronze ratings offer the best balance of efficiency and cost, resulting in less wasted heat and electricity.</li>
+                            <li><strong class="text-green-400">Modularity:</strong> Fully-modular PSUs offer the easiest building experience and cleanest cable management.</li>
+                            <li><strong class="text-green-400">Protections:</strong> Ensure the PSU has a full suite of protections (OVP, OCP, SCP, etc.) to safeguard your components.</li>
+                        </ul>
+                        <p class="mt-4 text-red-500 flicker">> CRITICAL WARNING: A low-quality PSU is a system-wide liability. Do not cut costs here.</p>`
                 },
-                { id: 'storage', name: 'Storage', desc: 'The Long-Term Memory',
-                  details: `
-                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
-                    <p>Non-volatile storage for your OS, applications, and files. Speed dramatically affects boot times and loading speeds.</p>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> HIERARCHY:</h3>
-                    <ul class="list-disc list-inside space-y-2">
-                        <li><strong class="text-green-400">NVMe SSD:</strong> The fastest option, using the PCIe bus. Ideal for the OS and frequently used applications.</li>
-                        <li><strong class="text-green-400">SATA SSD:</strong> Faster than HDDs but limited by the SATA interface. Good for game libraries and secondary storage.</li>
-                        <li><strong class="text-green-400">HDD:</strong> The slowest but most cost-effective option. Best for mass storage of media and archives.</li>
-                    </ul>
-                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> RECOMMENDED STRATEGY:</h3>
-                    <p>Use a hybrid approach: a fast NVMe SSD (500GB-1TB) for your OS and a larger SATA SSD or HDD for bulk data storage.</p>
-                  `
+                { 
+                    id: 'storage', name: 'Storage', desc: 'The Long-Term Memory',
+                    details: `
+                        <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                        <p>Non-volatile storage for your OS, applications, and files. Speed dramatically affects boot times and loading speeds.</p>
+                        <div class="diagram-container">
+                            <h4 class="text-lg font-bold text-cyan-400 mb-2 text-center">> STORAGE FORM FACTORS</h4>
+                            <svg viewBox="0 0 250 120" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-md mx-auto">
+                                <!-- HDD -->
+                                <rect x="10" y="20" width="80" height="100" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <text x="50" y="15" font-size="10" fill="var(--diagram-text)" text-anchor="middle">HDD (3.5")</text>
+                                <!-- SATA SSD -->
+                                <rect x="100" y="40" width="60" height="80" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <text x="130" y="35" font-size="10" fill="var(--diagram-text)" text-anchor="middle">SATA SSD (2.5")</text>
+                                <!-- NVMe SSD -->
+                                <rect x="170" y="70" width="70" height="20" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <text x="205" y="65" font-size="10" fill="var(--diagram-text)" text-anchor="middle">NVMe SSD (M.2)</text>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> HIERARCHY:</h3>
+                        <ul class="list-disc list-inside space-y-2">
+                            <li><strong class="text-green-400">NVMe SSD:</strong> The fastest option, using the PCIe bus. Ideal for the OS and frequently used applications. Look for models with a DRAM cache for best performance.</li>
+                            <li><strong class="text-green-400">SATA SSD:</strong> Faster than HDDs but limited by the SATA interface. Good for game libraries and secondary storage.</li>
+                            <li><strong class="text-green-400">HDD:</strong> The slowest but most cost-effective option. Best for mass storage of media and archives.</li>
+                        </ul>
+                        <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> RECOMMENDED STRATEGY:</h3>
+                        <p>Use a hybrid approach: a fast NVMe SSD (500GB-1TB) for your OS and a larger SATA SSD or HDD for bulk data storage.</p>`
                 },
                 { id: 'case', name: 'Case', desc: 'The Skeleton & Skin',
-                  details: `
-                     <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                  details: `<h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
                     <p>The enclosure that protects and houses all components. Crucial for organization, protection, and cooling.</p>
+                    <div class="diagram-container">
+                            <h4 class="text-lg font-bold text-cyan-400 mb-2 text-center">> OPTIMAL AIRFLOW PATH</h4>
+                            <svg viewBox="0 0 200 150" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-sm mx-auto">
+                                <rect x="10" y="10" width="180" height="130" fill="none" stroke="var(--diagram-stroke)" stroke-width="2"/>
+                                <!-- Fans -->
+                                <circle cx="180" cy="40" r="10" fill="none" stroke="var(--diagram-stroke)"/>
+                                <circle cx="100" cy="20" r="10" fill="none" stroke="var(--diagram-stroke)"/>
+                                <circle cx="20" cy="75" r="10" fill="none" stroke="var(--diagram-stroke)"/>
+                                <!-- Arrows -->
+                                <path d="M 35 75 H 80 L 70 70 M 80 75 L 70 80" fill="none" stroke="var(--diagram-fill)" stroke-width="1.5"/>
+                                <text x="55" y="90" font-size="8" fill="var(--diagram-text)">Intake</text>
+                                <path d="M 100 80 V 35 L 95 45 M 100 35 L 105 45" fill="none" stroke="var(--diagram-fill)" stroke-width="1.5"/>
+                                <text x="100" y="90" font-size="8" fill="var(--diagram-text)" text-anchor="middle">Exhaust</text>
+                                <path d="M 120 50 H 165 L 155 45 M 165 50 L 155 55" fill="none" stroke="var(--diagram-fill)" stroke-width="1.5"/>
+                            </svg>
+                        </div>
                     <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY CONSIDERATIONS:</h3>
                     <ul class="list-disc list-inside space-y-2">
                         <li><strong class="text-green-400">Compatibility:</strong> Must support your motherboard's form factor (ATX, mATX, etc.).</li>
                         <li><strong class="text-green-400">Clearance:</strong> Check manufacturer specs for max CPU cooler height and GPU length. This is a common build error.</li>
                         <li><strong class="text-green-400">Airflow:</strong> A case with a mesh front panel and multiple fan mounts will provide superior cooling performance.</li>
-                    </ul>
-                  `
+                    </ul>`
                 },
                 { id: 'cooling', name: 'Cooling', desc: 'Thermal Management System',
-                  details: `
-                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                  details: `<h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
                     <p>Removes heat from critical components like the CPU and GPU to prevent thermal throttling and ensure peak performance.</p>
+                    <div class="diagram-container">
+                            <h4 class="text-lg font-bold text-cyan-400 mb-2 text-center">> AIR COOLER VS AIO</h4>
+                            <svg viewBox="0 0 220 120" xmlns="http://www.w3.org/2000/svg" class="w-full max-w-md mx-auto">
+                                <!-- Air Cooler -->
+                                <text x="55" y="15" font-size="10" fill="var(--diagram-text)" text-anchor="middle">Air Cooler</text>
+                                <rect x="30" y="80" width="50" height="10" fill="var(--diagram-fill)" fill-opacity="0.5"/>
+                                <rect x="20" y="20" width="70" height="60" fill="none" stroke="var(--diagram-stroke)"/>
+                                <path d="M20 30h70 M20 40h70 M20 50h70 M20 60h70 M20 70h70" stroke="var(--diagram-stroke)" stroke-opacity="0.5"/>
+                                <circle cx="55" cy="50" r="15" fill="none" stroke="var(--diagram-stroke)"/>
+                                <!-- AIO -->
+                                <text x="165" y="15" font-size="10" fill="var(--diagram-text)" text-anchor="middle">AIO Cooler</text>
+                                <rect x="140" y="80" width="50" height="10" fill="var(--diagram-fill)" fill-opacity="0.5"/>
+                                <rect x="130" y="20" width="70" height="15" fill="none" stroke="var(--diagram-stroke)"/>
+                                <path d="M 165 35 Q 120 60 165 80" fill="none" stroke="var(--diagram-stroke)" stroke-dasharray="2"/>
+                                <path d="M 165 35 Q 210 60 165 80" fill="none" stroke="var(--diagram-stroke)" stroke-dasharray="2"/>
+                                <text x="165" y="98" font-size="8" fill="var(--diagram-text)" text-anchor="middle">CPU Block</text>
+                                <text x="165" y="45" font-size="8" fill="var(--diagram-text)" text-anchor="middle">Radiator</text>
+                            </svg>
+                        </div>
                     <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> METHODS:</h3>
                     <ul class="list-disc list-inside space-y-2">
                         <li><strong class="text-green-400">Air Cooling:</strong> Uses a heatsink and fan. High-end air coolers offer excellent price-to-performance and reliability.</li>
                         <li><strong class="text-green-400">AIO Liquid Cooling:</strong> A sealed liquid loop. Offers superior cooling for high-TDP CPUs and a cleaner aesthetic.</li>
                     </ul>
                     <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> AIRFLOW STRATEGY:</h3>
-                    <p>Establish a clear path: intake from the front/bottom, exhaust out the rear/top. A slightly positive pressure (more intake than exhaust CFM) is ideal to minimize dust.</p>
-                  `
+                    <p>Establish a clear path: intake from the front/bottom, exhaust out the rear/top. A slightly positive pressure (more intake than exhaust CFM) is ideal to minimize dust.</p>`
                 },
             ];
 
@@ -535,10 +732,7 @@
                 const card = document.createElement('div');
                 card.className = 'component-card p-6 rounded-lg cursor-pointer';
                 card.dataset.id = comp.id;
-                card.innerHTML = `
-                    <h3 class="text-2xl font-bold terminal-glow">${comp.name}</h3>
-                    <p class="text-cyan-400">${comp.desc}</p>
-                `;
+                card.innerHTML = `<h3 class="text-2xl font-bold terminal-glow">${comp.name}</h3><p class="text-cyan-400">${comp.desc}</p>`;
                 componentGrid.appendChild(card);
             });
 
@@ -547,7 +741,7 @@
                 if (card) {
                     const component = components.find(c => c.id === card.dataset.id);
                     if (component) {
-                        modalTitle.textContent = component.name;
+                        modalTitle.textContent = `// ${component.name.toUpperCase()}_DATASTREAM`;
                         modalBody.innerHTML = component.details;
                         modal.classList.remove('hidden');
                         modal.classList.add('flex');
@@ -566,8 +760,118 @@
                     modal.classList.remove('flex');
                 }
             });
+
+            // --- Settings ---
+            const themeSelect = document.getElementById('theme-select');
+            const scanlinesToggle = document.getElementById('scanlines-toggle');
+            const root = document.documentElement;
+
+            const themes = {
+                green: { '--main-bg': '#0a0a0a', '--text-color': '#e0e0e0', '--terminal-green': '#00ff41', '--terminal-cyan': '#00ffff', '--border-color': 'rgba(0, 255, 65, 0.3)' },
+                amber: { '--main-bg': '#1a1000', '--text-color': '#FFD580', '--terminal-green': '#FFC200', '--terminal-cyan': '#FF8F00', '--border-color': 'rgba(255, 194, 0, 0.3)' },
+                blue: { '--main-bg': '#051122', '--text-color': '#cce4ff', '--terminal-green': '#00BFFF', '--terminal-cyan': '#87CEFA', '--border-color': 'rgba(0, 191, 255, 0.3)' },
+                red: { '--main-bg': '#1c0005', '--text-color': '#ffc2d1', '--terminal-green': '#ff0033', '--terminal-cyan': '#ff4d6d', '--border-color': 'rgba(255, 0, 51, 0.3)' },
+                sakura: { '--main-bg': '#2E1F27', '--text-color': '#F5E6E8', '--terminal-green': '#FFB7C5', '--terminal-cyan': '#F06292', '--border-color': 'rgba(240, 98, 146, 0.4)' },
+                pastel: { '--main-bg': '#E6E6FA', '--text-color': '#4B4453', '--terminal-green': '#B9FBC0', '--terminal-cyan': '#98F5E1', '--border-color': 'rgba(152, 245, 225, 0.7)' },
+                oceanic: { '--main-bg': '#001f3f', '--text-color': '#7FDBFF', '--terminal-green': '#2ECC40', '--terminal-cyan': '#39CCCC', '--border-color': 'rgba(57, 204, 204, 0.4)' },
+            };
+
+            themeSelect.addEventListener('change', (e) => {
+                const theme = themes[e.target.value];
+                Object.keys(theme).forEach(key => {
+                    root.style.setProperty(key, theme[key]);
+                });
+                root.style.setProperty('--scrollbar-thumb', theme['--terminal-green']);
+                root.style.setProperty('--scrollbar-thumb-hover', theme['--terminal-cyan']);
+                root.style.setProperty('--diagram-stroke', theme['--terminal-cyan']);
+                root.style.setProperty('--diagram-fill', theme['--terminal-green']);
+                root.style.setProperty('--diagram-text', theme['--text-color']);
+            });
+
+            scanlinesToggle.addEventListener('change', (e) => {
+                document.body.classList.toggle('crt-scanlines', e.target.checked);
+            });
+
+            // --- Quiz ---
+            const quizContainer = document.getElementById('quiz-container');
+            const questionContainer = document.getElementById('quiz-question-container');
+            const resultContainer = document.getElementById('quiz-result-container');
+            const questionEl = document.getElementById('quiz-question');
+            const optionsEl = document.getElementById('quiz-options');
+            const scoreEl = document.getElementById('quiz-score');
+            const feedbackEl = document.getElementById('quiz-feedback');
+            const restartBtn = document.getElementById('quiz-restart-btn');
+
+            const quizData = [
+                { question: "For a PC primarily used for high-refresh-rate 1080p gaming, which component upgrade typically yields the biggest performance increase?", answer: 0, options: ["CPU", "PSU", "Case", "HDD Storage"] },
+                { question: "What is the primary benefit of enabling XMP or EXPO in the BIOS?", answer: 2, options: ["It lowers CPU temperatures", "It increases storage speed", "It runs RAM at its faster, advertised speed", "It improves Wi-Fi signal"] },
+                { question: "You are building a PC and your high-end CPU is overheating under load. What is the LEAST likely cause?", answer: 3, options: ["Improper thermal paste application", "Forgetting to remove the cooler's plastic film", "An inadequate CPU cooler (low TDP rating)", "The brand of your storage drive"] },
+                { question: "What does a 'GPU Bottleneck' signify in a gaming PC?", answer: 1, options: ["A critical system error that needs fixing", "The GPU is working at 100%, which is ideal for maximizing graphics", "The CPU is too slow for the GPU", "There is not enough VRAM"] }
+            ];
+
+            let currentQuestionIndex = 0;
+            let score = 0;
+
+            function loadQuiz() {
+                currentQuestionIndex = 0;
+                score = 0;
+                questionContainer.classList.remove('hidden');
+                resultContainer.classList.add('hidden');
+                showQuestion();
+            }
+
+            function showQuestion() {
+                const currentQuestion = quizData[currentQuestionIndex];
+                questionEl.textContent = `> ${currentQuestion.question}`;
+                optionsEl.innerHTML = '';
+                currentQuestion.options.forEach((option, index) => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.className = 'quiz-option text-left p-2 border border-gray-600 rounded hover:bg-gray-700';
+                    button.addEventListener('click', () => selectAnswer(index, button));
+                    optionsEl.appendChild(button);
+                });
+            }
+
+            function selectAnswer(selectedIndex, button) {
+                const correctIndex = quizData[currentQuestionIndex].answer;
+                const options = optionsEl.querySelectorAll('button');
+                
+                options.forEach(opt => opt.disabled = true);
+
+                if (selectedIndex === correctIndex) {
+                    button.classList.add('correct');
+                    score++;
+                } else {
+                    button.classList.add('incorrect');
+                    options[correctIndex].classList.add('correct');
+                }
+
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    if (currentQuestionIndex < quizData.length) {
+                        showQuestion();
+                    } else {
+                        showResults();
+                    }
+                }, 1500);
+            }
+
+            function showResults() {
+                questionContainer.classList.add('hidden');
+                resultContainer.classList.remove('hidden');
+                scoreEl.textContent = `Assessment Complete: ${score} / ${quizData.length} Correct`;
+                let feedback = "Anomalous performance. Recommend re-calibration.";
+                if (score === quizData.length) feedback = "Optimal performance achieved. You are a certified operator.";
+                else if (score >= quizData.length / 2) feedback = "Acceptable performance parameters. Further study recommended.";
+                feedbackEl.textContent = `> ${feedback}`;
+            }
+
+            restartBtn.addEventListener('click', loadQuiz);
+            
+            // Initial load
+            loadQuiz();
         });
     </script>
 </body>
 </html>
-
