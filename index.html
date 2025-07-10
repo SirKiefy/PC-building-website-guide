@@ -3,712 +3,571 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Chimera: A Guide to PC Assembly</title>
+    <title>Project Terminus</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        @keyframes background-pan {
-            0% { background-position: 0% 0%; }
-            100% { background-position: -200% 200%; }
-        }
-
-        @keyframes text-glitch {
-            0% { text-shadow: 0.05em 0 0 var(--primary-accent), -0.05em 0 0 var(--secondary-accent); }
-            14% { text-shadow: 0.05em 0 0 var(--primary-accent), -0.05em 0 0 var(--secondary-accent); }
-            15% { text-shadow: -0.05em -0.025em 0 var(--primary-accent), 0.025em 0.025em 0 var(--secondary-accent); }
-            49% { text-shadow: -0.05em -0.025em 0 var(--primary-accent), 0.025em 0.025em 0 var(--secondary-accent); }
-            50% { text-shadow: 0.025em 0.05em 0 var(--primary-accent), 0.05em 0 0 var(--secondary-accent); }
-            99% { text-shadow: 0.025em 0.05em 0 var(--primary-accent), 0.05em 0 0 var(--secondary-accent); }
-            100% { text-shadow: -0.025em 0 0 var(--primary-accent), -0.025em -0.05em 0 var(--secondary-accent); }
-        }
-        
-        /* --- THEME VARIABLES --- */
         :root {
-            --bg-color: #0d0d1a;
-            --text-color: #b3b3b3;
-            --text-color-light: #e0e0e0;
-            --border-color: #333;
-            --container-bg: rgba(18, 18, 28, 0.8);
-            --primary-accent: #00ffff;
-            --secondary-accent: #ff00ff;
-            --tertiary-accent: #ffff00;
-        }
-
-        body[data-theme="monochrome"] {
-            --bg-color: #121212;
-            --text-color: #b3b3b3;
-            --text-color-light: #ffffff;
-            --border-color: #444;
-            --container-bg: rgba(30, 30, 30, 0.8);
-            --primary-accent: #ffffff;
-            --secondary-accent: #cccccc;
-            --tertiary-accent: #dddddd;
-        }
-        
-        body[data-theme="solarized"] {
-            --bg-color: #002b36;
-            --text-color: #839496;
-            --text-color-light: #93a1a1;
-            --border-color: #073642;
-            --container-bg: rgba(7, 54, 66, 0.8);
-            --primary-accent: #2aa198;
-            --secondary-accent: #d33682;
-            --tertiary-accent: #b58900;
-        }
-        
-        body[data-theme="retro"] {
-            --bg-color: #000000;
-            --text-color: #00ff00;
-            --text-color-light: #33ff33;
-            --border-color: #00ff00;
-            --container-bg: rgba(0, 20, 0, 0.8);
-            --primary-accent: #00ff00;
-            --secondary-accent: #33ff33;
-            --tertiary-accent: #66ff66;
+            --main-bg: #0a0a0a;
+            --terminal-green: #00ff41;
+            --terminal-cyan: #00ffff;
+            --terminal-red: #ff0033;
+            --text-color: #e0e0e0;
+            --border-color: rgba(0, 255, 65, 0.3);
         }
 
         body {
-            font-family: 'Roboto Mono', monospace;
-            background-color: var(--bg-color);
+            background-color: var(--main-bg);
+            font-family: 'Fira Code', monospace;
             color: var(--text-color);
-            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 20px 20px;
-            animation: background-pan 30s linear infinite;
+            overflow-x: hidden;
         }
 
-        .scp-header { font-family: 'Share Tech Mono', monospace; }
-        .main-title:hover { animation: text-glitch 0.3s linear infinite; }
-
-        .scp-container {
-            border: 1px solid var(--border-color);
-            background-color: var(--container-bg);
-            backdrop-filter: blur(5px);
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.5), inset 0 0 5px rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-        }
-        .scp-container:hover {
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.7), inset 0 0 10px rgba(0, 255, 255, 0.1);
-            border-color: color-mix(in srgb, var(--primary-accent) 30%, transparent);
-        }
-
-        .scp-title {
-            color: var(--primary-accent);
-            border-bottom: 2px solid color-mix(in srgb, var(--primary-accent) 35%, transparent);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-            font-size: 1.75rem;
-            text-shadow: 0 0 5px var(--primary-accent);
-        }
-
-        .scp-subtitle {
-            color: var(--secondary-accent);
-            font-size: 1.25rem;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 0 5px color-mix(in srgb, var(--secondary-accent) 50%, transparent);
-        }
-
-        .nav-button {
-            background-color: transparent; border: 1px solid #444; color: #999;
-            padding: 0.5rem 1rem; transition: all 0.3s ease; position: relative; overflow: hidden;
-        }
-        .nav-button:before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--primary-accent) 35%, transparent), transparent);
-            transition: left 0.4s ease;
-        }
-        .nav-button:hover:before { left: 100%; }
-        .nav-button:hover, .nav-button.active {
-            color: var(--text-color-light); border-color: var(--primary-accent); background-color: color-mix(in srgb, var(--primary-accent) 10%, transparent); box-shadow: 0 0 10px color-mix(in srgb, var(--primary-accent) 35%, transparent);
-        }
-
-        .build-card {
-            border: 1px solid var(--border-color); background-color: #1E1E1E; border-radius: 0.5rem;
-            overflow: hidden; transition: all 0.3s ease; transform: perspective(1000px);
-        }
-        .build-card:hover {
-            transform: translateY(-10px) rotateX(5deg);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), 0 0 20px color-mix(in srgb, var(--primary-accent) 35%, transparent);
-            border-color: color-mix(in srgb, var(--primary-accent) 55%, transparent);
-        }
-        .build-header {
-            background: linear-gradient(45deg, #2a2a2a, #1a1a2e); padding: 1rem; border-bottom: 1px solid var(--border-color);
-        }
-        .build-title { color: var(--primary-accent); text-shadow: 0 0 3px var(--primary-accent); }
-        .build-price { color: var(--tertiary-accent); font-size: 1.5rem; text-shadow: 0 0 5px var(--tertiary-accent); }
-
-        table {
-            width: 100%; margin-top: 1rem; border-collapse: collapse; background-color: #1E1E1E; font-size: 0.875rem;
-        }
-        th, td { border: 1px solid var(--border-color); padding: 0.75rem; text-align: left; }
-        th { background-color: #2a2a2a; color: var(--secondary-accent); }
-        
-        .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .modal {
-            display: none; position: fixed; z-index: 100; left: 0; top: 0;
-            width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-        }
-        .modal-content {
-            background-color: var(--bg-color); margin: 5% auto; padding: 2rem;
-            border: 1px solid var(--primary-accent); border-radius: 0.5rem; width: 90%; max-width: 1200px;
-            box-shadow: 0 0 25px color-mix(in srgb, var(--primary-accent) 55%, transparent);
-        }
-        .modal-content p, .modal-content li { line-height: 1.6; }
-        .close-button {
-            color: #aaa; float: right; font-size: 28px; font-weight: bold;
-        }
-        .close-button:hover, .close-button:focus {
-            color: var(--text-color-light); text-decoration: none; cursor: pointer;
+        .terminal-glow {
+            text-shadow: 0 0 5px var(--terminal-green), 0 0 10px var(--terminal-green);
         }
         
-        .info-popout {
-            color: var(--primary-accent);
-            text-decoration: underline dotted;
-            cursor: pointer;
-            font-weight: bold;
+        .terminal-glow-cyan {
+            text-shadow: 0 0 5px var(--terminal-cyan), 0 0 10px var(--terminal-cyan);
         }
 
-        /* Intro Animation */
-        #intro-overlay {
+        .crt-scanlines::before {
+            content: " ";
+            display: block;
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 200;
-            display: flex;
-            align-items: flex-start;
-            justify-content: flex-start;
-            color: #0f0;
-            font-family: 'Share Tech Mono', monospace;
-            padding: 1rem;
-            overflow: hidden;
-            animation: flicker 0.1s infinite;
-        }
-        #intro-overlay::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 2px),
-                radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
             pointer-events: none;
-        }
-        #intro-text {
-            white-space: pre;
-            font-size: 1rem;
-            text-shadow: 0 0 5px #0f0;
-        }
-        .cursor {
-            display: inline-block;
-            background-color: #0f0;
-            width: 0.8ch;
-            height: 1rem;
-            animation: blink 1s step-end infinite;
-        }
-        @keyframes blink {
-            from, to { background-color: transparent; }
-            50% { background-color: #0f0; }
-        }
-        @keyframes flicker {
-            0% { opacity: 1; }
-            50% { opacity: 0.95; }
-            100% { opacity: 1; }
-        }
-        .intro-cmd { color: #00ffff; }
-        .intro-warn { color: #ffff00; }
-        .intro-err { color: #ff0000; animation: text-glitch-intro 0.1s infinite; }
-        .intro-ok { color: #33ff33; }
-        @keyframes text-glitch-intro {
-            0% { text-shadow: 0.05em 0 0 #ff0000, -0.05em 0 0 #00ffff; }
-            100% { text-shadow: -0.05em 0 0 #ff0000, 0.05em 0 0 #00ffff; }
+            animation: scanline-anim 15s linear infinite;
         }
         
-        .expandable-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.7s ease-in-out;
-            margin-top: 1rem;
+        @keyframes scanline-anim {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
         }
-        .anomaly-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            cursor: pointer;
+
+        .flicker {
+            animation: flicker-anim 0.1s infinite;
+        }
+
+        @keyframes flicker-anim {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .typing-effect::after {
+            content: '_';
+            animation: blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes blink-caret {
+            from, to { opacity: 1 }
+            50% { opacity: 0 }
+        }
+        
+        .progress-bar-inner {
+            background: linear-gradient(90deg, var(--terminal-green), var(--terminal-cyan));
+            box-shadow: 0 0 10px var(--terminal-green), 0 0 5px var(--terminal-cyan);
+        }
+
+        .nav-item {
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active, .nav-item:hover {
+            color: var(--terminal-cyan);
+            border-color: var(--terminal-cyan);
+            background-color: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+        }
+        
+        .component-card {
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            background-color: rgba(10, 20, 15, 0.3);
+        }
+
+        .component-card:hover {
+            border-color: var(--terminal-cyan);
+            background-color: rgba(0, 255, 255, 0.05);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal {
+            background-color: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            border: 1px solid var(--terminal-cyan);
+            background: var(--main-bg) url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><g fill="%2300ff41" fill-opacity="0.05"><rect x="0" y="0" width="10" height="10"/><rect x="10" y="10" width="10" height="10"/><rect x="20" y="20" width="10" height="10"/><rect x="30" y="30" width="10" height="10"/><rect x="40" y="40" width="10" height="10"/><rect x="50" y="50" width="10" height="10"/><rect x="60" y="60" width="10" height="10"/><rect x="70" y="70" width="10" height="10"/><rect x="80" y="80" width="10" height="10"/><rect x="90" y="90" width="10" height="10"/></g></svg>');
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--main-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--terminal-green);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--terminal-cyan);
         }
     </style>
 </head>
-<body>
-    <!-- Intro Overlay -->
-    <div id="intro-overlay">
-        <div id="intro-text-container">
-            <div id="intro-text"></div>
+<body class="crt-scanlines">
+
+    <!-- Log-on Screen -->
+    <div id="logon-screen" class="fixed inset-0 bg-black z-50 flex items-center justify-center p-4">
+        <div class="w-full max-w-4xl font-mono text-sm sm:text-base">
+            <div id="logon-content" class="text-green-400"></div>
+            <div id="progress-container" class="mt-4 w-full bg-gray-800 border border-green-700 rounded-sm h-6 p-1 hidden">
+                <div id="progress-bar" class="progress-bar-inner h-full rounded-sm" style="width: 0%;"></div>
+            </div>
+            <div id="logon-status" class="mt-2 text-cyan-400"></div>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div id="main-content" class="opacity-0 transition-opacity duration-1000">
-        <!-- Header -->
-        <header class="p-4 sticky top-0 z-50 shadow-lg bg-black/50 backdrop-blur-md border-b border-gray-800">
+    <div id="main-content" class="hidden">
+        <header class="p-4 bg-black/50 backdrop-blur-sm sticky top-0 z-40 border-b border-gray-800">
             <div class="container mx-auto flex justify-between items-center">
-                <h1 class="text-2xl scp-header main-title text-cyan-300 cursor-pointer">Project Chimera</h1>
-                <div id="page-nav" class="hidden md:flex space-x-2">
-                    <button class="nav-button active" data-page="intro">MEMORANDUM</button>
-                    <button class="nav-button" data-page="anomalies">ANOMALIES</button>
-                    <button class="nav-button" data-page="builds">SYSTEMS</button>
-                    <button class="nav-button" data-page="factions">FACTIONS</button>
-                    <button class="nav-button" data-page="settings">SETTINGS</button>
-                </div>
-                <button id="mobile-menu-button" class="md:hidden text-gray-300 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                </button>
+                <h1 class="text-2xl font-bold terminal-glow-cyan">[PROJECT_TERMINUS]</h1>
+                <nav id="main-nav" class="hidden md:flex space-x-2">
+                    <button class="nav-item px-4 py-2 rounded-md active" data-tab="home">HOME</button>
+                    <button class="nav-item px-4 py-2 rounded-md" data-tab="components">COMPONENTS</button>
+                    <button class="nav-item px-4 py-2 rounded-md" data-tab="upgrades">UPGRADES</button>
+                    <button class="nav-item px-4 py-2 rounded-md" data-tab="quizzes">QUIZZES</button>
+                    <button class="nav-item px-4 py-2 rounded-md" data-tab="prebuilt">PRE-BUILTS</button>
+                    <button class="nav-item px-4 py-2 rounded-md" data-tab="settings">SETTINGS</button>
+                </nav>
+                <button id="mobile-menu-btn" class="md:hidden text-cyan-400 text-2xl">☰</button>
             </div>
-            <div id="mobile-menu" class="hidden md:hidden mt-4 space-y-2">
-                 <button class="w-full text-left nav-button active" data-page="intro">MEMORANDUM</button>
-                 <button class="w-full text-left nav-button" data-page="anomalies">ANOMALIES</button>
-                 <button class="w-full text-left nav-button" data-page="builds">SYSTEMS</button>
-                 <button class="w-full text-left nav-button" data-page="factions">FACTIONS</button>
-                 <button class="w-full text-left nav-button" data-page="settings">SETTINGS</button>
+            <div id="mobile-menu" class="hidden md:hidden mt-4 flex flex-col space-y-2">
+                 <!-- Mobile nav items will be injected here by JS -->
             </div>
         </header>
 
         <main class="container mx-auto p-4 md:p-8">
-            <!-- Introduction Page -->
-            <div id="page-intro" class="page active">
-                <div class="scp-container">
-                    <h2 class="scp-title">MEMORANDUM FOR THE O5 COUNCIL</h2>
-                    <p class="mb-4"><strong>SUBJECT:</strong> Analysis of Anomalous Computational Artifacts (Codename: CHIMERA)</p>
-                    <p>This document provides a comprehensive technical analysis of the components required for the assembly of self-contained computational systems. These systems, while seemingly mundane, exhibit complex behaviors derived from the interaction of their constituent parts, hereafter referred to as "Anomalies." Our objective is to deconstruct the esoteric principles governing their function—from quantum-state logic gates to photonic rendering engines—to establish standardized containment and assembly procedures.</p>
+            <!-- Home Tab -->
+            <section id="home" class="tab-content">
+                <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
+                    <h2 class="text-3xl font-bold terminal-glow mb-4">> SYSTEM_OVERVIEW</h2>
+                    <p class="mb-4">Welcome, Operator. Project Terminus is a restricted-access educational node dedicated to the architecture of modern computational hardware. This system provides a comprehensive journey into PC hardware, from foundational principles to advanced assembly and tuning.</p>
+                    <p>Navigate via the command tabs. Each module contains interactive data streams and diagrams. Proceed with caution. System integrity is paramount.</p>
                 </div>
-            </div>
+                
+                <div class="grid md:grid-cols-2 gap-6 mt-6">
+                    <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
+                        <h3 class="text-2xl font-bold terminal-glow-cyan mb-4">> INTEL_FEED: LATEST_TRANSMISSIONS</h3>
+                        <ul class="space-y-3">
+                            <li><span class="text-cyan-400">[2025-07-10]</span>: New 'Blackwell' GPU architecture benchmarks leaked. Performance gains exceed projections.</li>
+                            <li><span class="text-cyan-400">[2025-07-08]</span>: DDR6 memory spec draft finalized. Expect 12,800 MT/s base speeds.</li>
+                            <li><span class="text-cyan-400">[2025-07-05]</span>: <span class="text-red-500">[CLASSIFIED]</span> Anomaly detected in consumer-grade AI accelerators. Investigation ongoing.</li>
+                        </ul>
+                    </div>
+                    <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20 flicker">
+                         <h3 class="text-2xl font-bold text-red-500 mb-4">> WARNING: SYSTEM_ALERT</h3>
+                         <p>Unusual power fluctuations detected in Sector 7-G. PSU integrity checks recommended for all field operatives. A low-quality power supply is a critical vulnerability. Do not compromise on power delivery systems.</p>
+                    </div>
+                </div>
 
-            <!-- Components Page -->
-            <div id="page-anomalies" class="page">
-                <h2 class="text-3xl scp-header text-cyan-300 my-8 border-b-2 border-cyan-300/50 pb-2">Anomaly Catalog: Component Analysis</h2>
-                <div class="scp-container">
-                    <p>The following is a high-level summary of each core anomaly. Click on a header to expand its summary. For detailed technical analysis, click on any highlighted term within the summary to access the relevant deep-dive documentation.</p>
+                <div class="mt-6 border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
+                     <h3 class="text-2xl font-bold terminal-glow mb-4">> ANIMATED_BANNER: THE_CORE_TRIANGLE</h3>
+                     <div class="flex flex-col md:flex-row justify-around items-center space-y-4 md:space-y-0 md:space-x-4">
+                        <div class="text-center">
+                            <svg class="w-24 h-24 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+                            <p class="text-lg font-bold text-cyan-400">CPU</p>
+                            <p class="text-sm">The Brain</p>
+                        </div>
+                        <div class="text-cyan-400 text-4xl animate-pulse">&lt;--&gt;</div>
+                        <div class="text-center">
+                            <svg class="w-24 h-24 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                             <p class="text-lg font-bold text-cyan-400">MOTHERBOARD</p>
+                            <p class="text-sm">The Nervous System</p>
+                        </div>
+                         <div class="text-cyan-400 text-4xl animate-pulse">&lt;--&gt;</div>
+                        <div class="text-center">
+                            <svg class="w-24 h-24 mx-auto mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h20"></path><path d="M2 6h20"></path><path d="M2 18h20"></path></svg>
+                             <p class="text-lg font-bold text-cyan-400">RAM</p>
+                            <p class="text-sm">The Workspace</p>
+                        </div>
+                     </div>
                 </div>
-                <div class="scp-container">
-                    <div class="anomaly-header">
-                        <h3 class="scp-title flex-grow">Anomaly-01: Central Processing Unit (CPU)</h3>
-                        <button class="expand-button text-cyan-400 font-bold p-2">[+ Expand]</button>
-                    </div>
-                    <div class="expandable-content">
-                        <p class="text-sm">The CPU is the system's brain, executing instructions via a <span class="info-popout" data-modal="cpu-cycle-modal">Fetch-Decode-Execute cycle</span>. Its performance is a balance of <span class="info-popout" data-modal="cpu-ipc-modal">IPC and Clock Speed</span>. Modern CPUs use multiple <span class="info-popout" data-modal="cpu-cores-modal">Cores and Threads</span> for parallelism, with some employing a hybrid architecture of Performance and Efficiency cores. A large <span class="info-popout" data-modal="cpu-cache-modal">CPU Cache</span> is critical for reducing latency to main memory, especially in gaming.</p>
-                    </div>
-                </div>
-                <div class="scp-container">
-                    <div class="anomaly-header">
-                        <h3 class="scp-title flex-grow">Anomaly-02: Graphics Processing Unit (GPU)</h3>
-                        <button class="expand-button text-cyan-400 font-bold p-2">[+ Expand]</button>
-                    </div>
-                    <div class="expandable-content">
-                        <p class="text-sm">The GPU is a massively parallel processor optimized for high-throughput tasks like rendering. Its architecture is based on the <span class="info-popout" data-modal="gpu-simd-modal">SIMD model</span>, allowing it to perform the same operation on thousands of data points (pixels) simultaneously. It contains specialized hardware like <span class="info-popout" data-modal="gpu-rt-modal">RT Cores</span> for ray tracing and <span class="info-popout" data-modal="gpu-tensor-modal">Tensor Cores</span> for AI, which power upscaling technologies like DLSS. Performance is heavily influenced by its dedicated <span class="info-popout" data-modal="gpu-vram-modal">VRAM</span> capacity and bandwidth.</p>
-                    </div>
-                </div>
-                <div class="scp-container">
-                    <div class="anomaly-header">
-                        <h3 class="scp-title flex-grow">Anomaly-03: Motherboard</h3>
-                        <button class="expand-button text-cyan-400 font-bold p-2">[+ Expand]</button>
-                    </div>
-                    <div class="expandable-content">
-                        <p class="text-sm">The motherboard is the system's central nervous system, connecting all components. Its most critical feature is the <span class="info-popout" data-modal="mb-vrm-modal">Voltage Regulator Module (VRM)</span>, which provides clean, stable power to the CPU. The motherboard's <span class="info-popout" data-modal="mb-chipset-modal">Chipset</span> dictates its feature set, including connectivity options and support for overclocking. It also allocates <span class="info-popout" data-modal="mb-pcie-modal">PCIe lanes</span> for communication between the CPU, GPU, and other peripherals.</p>
-                    </div>
-                </div>
-                <div class="scp-container">
-                    <div class="anomaly-header">
-                        <h3 class="scp-title flex-grow">Anomaly-04: Random Access Memory (RAM)</h3>
-                        <button class="expand-button text-cyan-400 font-bold p-2">[+ Expand]</button>
-                    </div>
-                    <div class="expandable-content">
-                        <p class="text-sm">RAM is the system's volatile, high-speed workspace. Performance is a balance between capacity (GB) and speed (MT/s). True responsiveness is determined by its <span class="info-popout" data-modal="ram-latency-modal">Absolute Latency</span>, a calculation involving both speed and timings (like CL). Modern <span class="info-popout" data-modal="ram-ddr5-modal">DDR5 memory</span> offers significant architectural advantages over DDR4. To achieve advertised speeds, one must enable <span class="info-popout" data-modal="ram-xmp-modal">XMP or EXPO</span> profiles in the BIOS.</p>
-                    </div>
-                </div>
-                <div class="scp-container">
-                    <div class="anomaly-header">
-                        <h3 class="scp-title flex-grow">Anomaly-05: Storage</h3>
-                        <button class="expand-button text-cyan-400 font-bold p-2">[+ Expand]</button>
-                    </div>
-                    <div class="expandable-content">
-                        <p class="text-sm">Storage provides long-term, non-volatile memory. The hierarchy ranges from slow, high-capacity **HDDs** to fast **SATA SSDs**, up to the fastest **NVMe SSDs**. The performance difference is due to the interface (<span class="info-popout" data-modal="storage-protocol-modal">SATA/AHCI vs. PCIe/NVMe</span>). SSDs themselves are built from different types of <span class="info-popout" data-modal="storage-nand-modal">NAND flash</span> (e.g., TLC, QLC), which determines their cost, performance, and endurance.</p>
-                    </div>
-                </div>
-                <div class="scp-container">
-                    <div class="anomaly-header">
-                        <h3 class="scp-title flex-grow">Anomaly-06: Power Supply Unit (PSU)</h3>
-                        <button class="expand-button text-cyan-400 font-bold p-2">[+ Expand]</button>
-                    </div>
-                    <div class="expandable-content">
-                        <p class="text-sm">The PSU converts AC wall power to DC power for the system. Quality is paramount. Key metrics include wattage and the <span class="info-popout" data-modal="psu-efficiency-modal">80 PLUS efficiency rating</span>. A good PSU features high-quality internal components, especially Japanese capacitors, and a full suite of <span class="info-popout" data-modal="psu-protections-modal">protection circuits</span> to ensure system safety and stability.</p>
-                    </div>
-                </div>
-                <div class="scp-container">
-                    <div class="anomaly-header">
-                        <h3 class="scp-title flex-grow">Anomaly-07: Thermal Management</h3>
-                        <button class="expand-button text-cyan-400 font-bold p-2">[+ Expand]</button>
-                    </div>
-                    <div class="expandable-content">
-                        <p class="text-sm">Cooling is essential for performance and longevity. <span class="info-popout" data-modal="cooling-air-modal">Air Coolers</span> are reliable and cost-effective. <span class="info-popout" data-modal="cooling-aio-modal">All-In-One (AIO) Liquid Coolers</span> offer superior thermal capacity for high-end CPUs. For ultimate performance, enthusiasts use <span class="info-popout" data-modal="cooling-custom-modal">Custom Liquid Cooling</span>. All methods rely on effective <span class="info-popout" data-modal="cooling-airflow-modal">Case Airflow</span> to exhaust heat from the chassis.</p>
-                    </div>
-                </div>
-            </div>
+            </section>
 
-            <!-- Builds Page -->
-            <div id="page-builds" class="page">
-                <h2 class="text-3xl scp-header text-cyan-300 my-8 border-b-2 border-cyan-300/50 pb-2">Contained Systems: Assembly Protocols (2025)</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div class="build-card"><div class="build-header"><h3 class="text-xl font-bold build-title">System-01: "The Scribe"</h3></div><div class="p-6"><p class="build-price">~£800</p><p class="text-gray-400">1080p Esports & Productivity</p><button class="modal-button mt-4 nav-button" data-modal="scribe-modal">View Details</button></div></div>
-                    <div class="build-card"><div class="build-header"><h3 class="text-xl font-bold build-title">System-02: "The Agent"</h3></div><div class="p-6"><p class="build-price">~£1500</p><p class="text-gray-400">1440p Gaming Sweet Spot</p><button class="modal-button mt-4 nav-button" data-modal="agent-modal">View Details</button></div></div>
-                    <div class="build-card"><div class="build-header"><h3 class="text-xl font-bold build-title">System-03: "The Vanguard"</h3></div><div class="p-6"><p class="build-price">~£2200</p><p class="text-gray-400">High-End 1440p / 4K Gaming</p><button class="modal-button mt-4 nav-button" data-modal="vanguard-modal">View Details</button></div></div>
-                    <div class="build-card"><div class="build-header"><h3 class="text-xl font-bold build-title">System-04: "The Oracle"</h3></div><div class="p-6"><p class="build-price">~£4000+</p><p class="text-gray-400">No-Compromise 4K</p><button class="modal-button mt-4 nav-button" data-modal="oracle-modal">View Details</button></div></div>
-                    <div class="build-card"><div class="build-header"><h3 class="text-xl font-bold build-title">System-05: "The Architect"</h3></div><div class="p-6"><p class="build-price">~£3000</p><p class="text-gray-400">Content Creation Workstation</p><button class="modal-button mt-4 nav-button" data-modal="architect-modal">View Details</button></div></div>
-                    <div class="build-card"><div class="build-header"><h3 class="text-xl font-bold build-title">System-06: "The Phantom"</h3></div><div class="p-6"><p class="build-price">~£1800</p><p class="text-gray-400">Compact SFF Powerhouse</p><button class="modal-button mt-4 nav-button" data-modal="phantom-modal">View Details</button></div></div>
+            <!-- Components Tab -->
+            <section id="components" class="tab-content hidden">
+                <h2 class="text-3xl font-bold terminal-glow mb-6">> COMPONENT_DATABASE</h2>
+                <div id="component-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Component cards will be injected here by JS -->
                 </div>
-            </div>
+            </section>
 
-            <!-- Factions Page -->
-            <div id="page-factions" class="page">
-                <h2 class="text-3xl scp-header text-cyan-300 my-8 border-b-2 border-cyan-300/50 pb-2">Known Factions: Brand Analysis (2025)</h2>
-                <div class="scp-container">
-                     <table>
-                        <thead><tr><th>Faction</th><th>Strengths</th><th>Weaknesses</th></tr></thead>
-                        <tbody>
-                            <tr><td><strong>Intel (CPU)</strong></td><td>Strong single-core, P-core/E-core design is great for multitasking.</td><td>High power use on 'K' models, frequent socket changes increase upgrade costs.</td></tr>
-                            <tr><td><strong>AMD (CPU)</strong></td><td>Power efficiency, great multi-core, X3D gaming leadership due to massive cache. Long-term AM5 socket support.</td><td>Single-core can trail Intel's best. X3D models less optimal for pure productivity.</td></tr>
-                            <tr><td><strong>NVIDIA (GPU)</strong></td><td>Ray tracing leader, mature DLSS tech, dominant CUDA ecosystem for pro apps.</td><td>Price premium, high power draw on top-tier cards.</td></tr>
-                            <tr><td><strong>AMD (GPU)</strong></td><td>Strong rasterization, great price/performance. FSR is open and widely supported.</td><td>Ray tracing/upscaling quality catching up to NVIDIA. Less mature pro software ecosystem.</td></tr>
-                            <tr><td><strong>Intel (GPU)</strong></td><td>Aggressive pricing, often more VRAM than competitors at a given price point. XeSS is a compelling upscaler.</td><td>Driver maturity is still improving. Performance can be inconsistent in older, non-DX12 titles.</td></tr>
-                            <tr><td><strong>ASUS (MB)</strong></td><td>Premium features, excellent BIOS/UEFI for overclocking.</td><td>"ASUS tax" price premium, inconsistent customer support reported.</td></tr>
-                            <tr><td><strong>Gigabyte (MB)</strong></td><td>Durable ("Ultra Durable"), good value and feature set.</td><td>BIOS less polished than some rivals, companion software can be clunky.</td></tr>
-                            <tr><td><strong>MSI (MB)</strong></td><td>Strong mid-range value ("Tomahawk" series), balanced features.</td><td>Bloated companion software ("MSI Center") is a common complaint.</td></tr>
-                        </tbody>
-                    </table>
+            <!-- Upgrades Tab -->
+            <section id="upgrades" class="tab-content hidden">
+                 <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
+                    <h2 class="text-3xl font-bold terminal-glow mb-4">> UPGRADE_PATHWAYS</h2>
+                    <p class="text-yellow-400">> STATUS: Module under construction. Data stream pending.</p>
+                    <p>This section will provide detailed guides on upgrading individual components, identifying bottlenecks, and planning a cost-effective upgrade path for your system.</p>
                 </div>
-            </div>
+            </section>
 
-            <!-- Settings Page -->
-            <div id="page-settings" class="page">
-                <h2 class="text-3xl scp-header text-cyan-300 my-8 border-b-2 border-cyan-300/50 pb-2">System Interface Settings</h2>
-                <div class="scp-container">
-                    <h3 class="scp-title">Visual Theme Selection</h3>
-                    <p class="mb-4 text-gray-400">Select a visual theme for the user interface. Your preference will be saved.</p>
-                    <div class="flex flex-wrap gap-4">
-                        <button class="theme-button nav-button" data-theme="cyberpunk">Cyberpunk (Default)</button>
-                        <button class="theme-button nav-button" data-theme="monochrome">Monochrome</button>
-                        <button class="theme-button nav-button" data-theme="solarized">Solarized Dark</button>
-                        <button class="theme-button nav-button" data-theme="retro">Retro Terminal</button>
+            <!-- Quizzes Tab -->
+            <section id="quizzes" class="tab-content hidden">
+                <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
+                    <h2 class="text-3xl font-bold terminal-glow mb-4">> KNOWLEDGE_ASSESSMENT</h2>
+                    <p class="text-yellow-400">> STATUS: Module under construction. Data stream pending.</p>
+                     <div class="mt-4">
+                        <p class="font-bold text-cyan-400 mb-2">Sample Question:</p>
+                        <p>Which component is most critical for high-resolution (4K) gaming performance?</p>
+                        <div class="flex flex-col space-y-2 mt-2">
+                            <button class="text-left p-2 border border-gray-600 rounded hover:bg-green-900">A) CPU</button>
+                            <button class="text-left p-2 border border-gray-600 rounded hover:bg-green-900">B) RAM</button>
+                            <button class="text-left p-2 border border-gray-600 rounded hover:bg-green-900">C) GPU</button>
+                            <button class="text-left p-2 border border-gray-600 rounded hover:bg-green-900">D) PSU</button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </section>
+
+            <!-- Pre-built Tab -->
+            <section id="prebuilt" class="tab-content hidden">
+                 <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
+                    <h2 class="text-3xl font-bold terminal-glow mb-4">> PRE-CONFIGURED_SYSTEMS</h2>
+                    <p class="text-yellow-400">> STATUS: Module under construction. Data stream pending.</p>
+                    <p>This section will detail 6 fully-spec'd pre-built system configurations for various use-cases and budgets, from entry-level gaming to high-end workstations.</p>
+                </div>
+            </section>
+
+            <!-- Settings Tab -->
+            <section id="settings" class="tab-content hidden">
+                 <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
+                    <h2 class="text-3xl font-bold terminal-glow mb-4">> INTERFACE_SETTINGS</h2>
+                    <p class="text-yellow-400">> STATUS: Module under construction. Data stream pending.</p>
+                    <div class="mt-4 space-y-4">
+                        <div>
+                            <label for="theme-select" class="block mb-2 text-cyan-400">Color Scheme:</label>
+                            <select id="theme-select" class="bg-gray-800 border border-gray-600 rounded p-2 w-full md:w-1/3">
+                                <option>Terminal Green (Default)</option>
+                                <option disabled>Amber</option>
+                                <option disabled>Arctic Blue</option>
+                            </select>
+                        </div>
+                         <div>
+                            <label class="flex items-center space-x-2 text-cyan-400">
+                                <input type="checkbox" class="form-checkbox bg-gray-800 border-gray-600 text-green-500" checked>
+                                <span>Enable Scanlines Effect</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 
-    <!-- Modals for Build Details -->
-    <div id="scribe-modal" class="modal"><div class="modal-content"><span class="close-button">&times;</span><h2 class="scp-title">System-01: "The Scribe"</h2><p class="scp-subtitle">Analysis</p><p class="text-sm mb-4">An optimal entry-point into PC gaming. The Ryzen 5 7600 is a highly efficient 6-core CPU that doesn't require expensive cooling. The Intel Arc B580 is chosen for its strong value proposition, offering competitive 1080p performance and more VRAM than its direct competitors, providing better longevity. 16GB of DDR5 is sufficient for this tier, and a 1TB NVMe drive provides fast loading.</p><p class="scp-subtitle">Component Log</p><table><thead><tr><th>Component</th><th>Model</th><th>Retailer Link</th></tr></thead><tbody>
-        <tr><td>CPU</td><td>AMD Ryzen 5 7600</td><td><a href="https://www.scan.co.uk/search?q=Ryzen+5+7600" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>Motherboard</td><td>Gigabyte B650M Gaming X AX</td><td><a href="https://www.scan.co.uk/search?q=Gigabyte+B650M" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>RAM</td><td>16GB (2x8GB) DDR5 5200MHz CL40</td><td><a href="https://www.scan.co.uk/search?q=16GB+DDR5+5200" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>Storage</td><td>1TB Crucial P3 Plus PCIe 4.0 NVMe SSD</td><td><a href="https://www.scan.co.uk/search?q=Crucial+P3+Plus+1TB" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>GPU</td><td>Intel Arc B580 8GB</td><td><a href="https://www.overclockers.co.uk/search?sSearch=Intel+Arc+B580" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Case</td><td>Corsair 4000D Airflow</td><td><a href="https://www.scan.co.uk/search?q=Corsair+4000D" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>PSU</td><td>Corsair CX650M 650W 80+ Bronze</td><td><a href="https://www.scan.co.uk/search?q=Corsair+CX650M" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-    </tbody></table></div></div>
-    <div id="agent-modal" class="modal"><div class="modal-content"><span class="close-button">&times;</span><h2 class="scp-title">System-02: "The Agent"</h2><p class="scp-subtitle">Analysis</p><p class="text-sm mb-4">The 1440p powerhouse. The Ryzen 7 9800X3D is the definitive gaming CPU due to its massive 96MB of 3D V-Cache, which dramatically improves 1% low frame rates for a smoother experience. The RTX 5070 Ti offers exceptional 1440p performance with access to mature DLSS technology. 32GB of fast 6000MHz CL30 RAM is the sweet spot for Ryzen 9000, and a fast 2TB TLC-based NVMe SSD provides ample space for modern games.</p><p class="scp-subtitle">Component Log</p><table><thead><tr><th>Component</th><th>Model</th><th>Retailer Link</th></tr></thead><tbody>
-        <tr><td>CPU</td><td>AMD Ryzen 7 9800X3D</td><td><a href="https://www.overclockers.co.uk/search?sSearch=9800x3d" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Cooler</td><td>Thermalright Phantom Spirit 120 SE</td><td><a href="https://www.amazon.co.uk/s?k=Thermalright+Phantom+Spirit+120" target="_blank" class="text-cyan-400 hover:underline">Amazon UK</a></td></tr>
-        <tr><td>Motherboard</td><td>MSI MAG B850 Tomahawk WIFI</td><td><a href="https://www.scan.co.uk/search?q=MSI+B850+Tomahawk" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>RAM</td><td>32GB (2x16GB) G.Skill Flare X5 DDR5 6000MHz CL30 EXPO</td><td><a href="https://www.overclockers.co.uk/search?sSearch=G.Skill+Flare+X5+32GB" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Storage</td><td>2TB WD Black SN850X PCIe 4.0 NVMe SSD</td><td><a href="https://www.scan.co.uk/search?q=WD+SN850X+2TB" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>GPU</td><td>NVIDIA GeForce RTX 5070 Ti 16GB</td><td><a href="https://www.overclockers.co.uk/search?sSearch=RTX+5070+Ti" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Case</td><td>Lian Li Lancool 216</td><td><a href="https://www.overclockers.co.uk/search?sSearch=Lancool+216" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>PSU</td><td>SeaSonic FOCUS GX-850 850W 80+ Gold</td><td><a href="https://www.scan.co.uk/search?q=Seasonic+FOCUS+GX-850" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-    </tbody></table></div></div>
-    <div id="vanguard-modal" class="modal"><div class="modal-content"><span class="close-button">&times;</span><h2 class="scp-title">System-03: "The Vanguard"</h2><p class="scp-subtitle">Analysis</p><p class="text-sm mb-4">A high-end system for 1440p ultra settings or entry-level 4K. The Intel Core Ultra 7 265K offers a great blend of gaming and productivity performance with its new Arrow Lake architecture. The RTX 5080 is a true 4K-capable GPU, providing the power needed for demanding titles with ray tracing. A 280mm or 360mm AIO is recommended to cool the 265K effectively under sustained load.</p><p class="scp-subtitle">Component Log</p><table><thead><tr><th>Component</th><th>Model</th><th>Retailer Link</th></tr></thead><tbody>
-        <tr><td>CPU</td><td>Intel Core Ultra 7 265K</td><td><a href="https://www.scan.co.uk/search?q=265K" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>Cooler</td><td>Arctic Liquid Freezer III 360 A-RGB</td><td><a href="https://www.overclockers.co.uk/search?sSearch=Arctic+Liquid+Freezer+III+360" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Motherboard</td><td>ASUS ROG STRIX Z890-F GAMING WIFI</td><td><a href="https://www.scan.co.uk/search?q=ASUS+Z890-F" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>RAM</td><td>32GB (2x16GB) Corsair Vengeance RGB DDR5 7200MHz CL34</td><td><a href="https://www.scan.co.uk/search?q=Corsair+Vengeance+32GB+DDR5+7200" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>Storage</td><td>2TB Samsung 990 Pro PCIe 4.0 NVMe SSD</td><td><a href="https://www.scan.co.uk/search?q=Samsung+990+Pro+2TB" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>GPU</td><td>NVIDIA GeForce RTX 5080 16GB</td><td><a href="https://www.overclockers.co.uk/search?sSearch=RTX+5080" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Case</td><td>Fractal Design North</td><td><a href="https://www.scan.co.uk/search?q=Fractal+Design+North" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>PSU</td><td>SeaSonic FOCUS SPX-1000 1000W 80+ Platinum</td><td><a href="https://www.scan.co.uk/search?q=Seasonic+1000W+Platinum" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-    </tbody></table></div></div>
-    <div id="oracle-modal" class="modal"><div class="modal-content"><span class="close-button">&times;</span><h2 class="scp-title">System-04: "The Oracle"</h2><p class="scp-subtitle">Analysis</p><p class="text-sm mb-4">The pinnacle of consumer PC performance. The RTX 5090 is the only choice for a no-compromise, high-refresh-rate 4K gaming experience with all settings, including path tracing, maxed out. The Ryzen 9 9950X3D provides the best possible gaming performance while also offering 16 cores for extreme multitasking. A high-end motherboard with a robust VRM, a powerful 420mm AIO, and a high-wattage ATX 3.0 PSU are non-negotiable to support these power-hungry components.</p><p class="scp-subtitle">Component Log</p><table><thead><tr><th>Component</th><th>Model</th><th>Retailer Link</th></tr></thead><tbody>
-        <tr><td>CPU</td><td>AMD Ryzen 9 9950X3D</td><td><a href="https://www.overclockers.co.uk/search?sSearch=9950x3d" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Cooler</td><td>Lian Li Galahad II Trinity Performance 420</td><td><a href="https://www.overclockers.co.uk/search?sSearch=Galahad+II+420" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Motherboard</td><td>ASUS ROG CROSSHAIR X870E HERO</td><td><a href="https://www.scan.co.uk/search?q=ASUS+X870E+HERO" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>RAM</td><td>64GB (2x32GB) G.Skill Trident Z5 RGB DDR5 6400MHz CL32</td><td><a href="https://www.overclockers.co.uk/search?sSearch=G.Skill+Trident+Z5+64GB" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Storage</td><td>4TB Crucial T700 PCIe 5.0 NVMe SSD</td><td><a href="https://www.scan.co.uk/search?q=Crucial+T700+4TB" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>GPU</td><td>NVIDIA GeForce RTX 5090 32GB</td><td><a href="https://www.overclockers.co.uk/search?sSearch=RTX+5090" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Case</td><td>Lian Li V3000 Plus</td><td><a href="https://www.overclockers.co.uk/search?sSearch=Lian+Li+V3000" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>PSU</td><td>Corsair AX1600i 1600W 80+ Titanium</td><td><a href="https://www.scan.co.uk/search?sSearch=Corsair+AX1600i" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-    </tbody></table></div></div>
-    <div id="architect-modal" class="modal"><div class="modal-content"><span class="close-button">&times;</span><h2 class="scp-title">System-05: "The Architect"</h2><p class="scp-subtitle">Analysis</p><p class="text-sm mb-4">A workstation focused on maximum productivity. The Intel Core Ultra 9 285K is chosen for its high core count and strong performance in mixed single and multi-threaded workloads. The RTX 5070 Ti is a powerful GPU for hardware-accelerated rendering and AI tasks, leveraging the CUDA ecosystem. 64GB of RAM is essential for handling large project files in video editing or 3D modeling, and a multi-drive setup provides a fast scratch disk and bulk storage.</p><p class="scp-subtitle">Component Log</p><table><thead><tr><th>Component</th><th>Model</th><th>Retailer Link</th></tr></thead><tbody>
-        <tr><td>CPU</td><td>Intel Core Ultra 9 285K</td><td><a href="https://www.scan.co.uk/search?q=285k" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>Cooler</td><td>Arctic Liquid Freezer III 360</td><td><a href="https://www.overclockers.co.uk/search?sSearch=Arctic+Liquid+Freezer+III+360" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Motherboard</td><td>MSI MAG Z890 TOMAHAWK WIFI</td><td><a href="https://www.scan.co.uk/search?q=MSI+Z890+Tomahawk" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>RAM</td><td>64GB (2x32GB) Corsair Vengeance DDR5 6000MHz CL30</td><td><a href="https://www.scan.co.uk/search?q=Corsair+Vengeance+64GB+DDR5" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>Storage (OS)</td><td>2TB WD Black SN850X PCIe 4.0 NVMe SSD</td><td><a href="https://www.scan.co.uk/search?q=WD+SN850X+2TB" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>Storage (Bulk)</td><td>4TB Crucial MX500 SATA SSD</td><td><a href="https://www.scan.co.uk/search?q=Crucial+MX500+4TB" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>GPU</td><td>NVIDIA GeForce RTX 5070 Ti 16GB</td><td><a href="https://www.overclockers.co.uk/search?sSearch=RTX+5070+Ti" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Case</td><td>be quiet! Silent Base 802</td><td><a href="https://www.scan.co.uk/search?q=Silent+Base+802" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>PSU</td><td>be quiet! Pure Power 12 M 1000W 80+ Gold</td><td><a href="https://www.scan.co.uk/search?q=Pure+Power+12+M+1000W" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-    </tbody></table></div></div>
-    <div id="phantom-modal" class="modal"><div class="modal-content"><span class="close-button">&times;</span><h2 class="scp-title">System-06: "The Phantom"</h2><p class="scp-subtitle">Analysis</p><p class="text-sm mb-4">A compact small form factor (SFF) build that doesn't compromise on power. The Ryzen 7 9800X3D is chosen for its top-tier gaming performance and manageable thermal output. Component selection is critical for SFF: a compact dual-slot GPU is required, along with a low-profile CPU cooler, an ITX motherboard, and a high-wattage SFX power supply. Building in an SFF case requires meticulous planning and cable management.</p><p class="scp-subtitle">Component Log</p><table><thead><tr><th>Component</th><th>Model</th><th>Retailer Link</th></tr></thead><tbody>
-        <tr><td>CPU</td><td>AMD Ryzen 7 9800X3D</td><td><a href="https://www.overclockers.co.uk/search?sSearch=9800x3d" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Cooler</td><td>Noctua NH-L12S</td><td><a href="https://www.scan.co.uk/search?q=Noctua+NH-L12S" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>Motherboard</td><td>ASUS ROG STRIX X870E-I GAMING WIFI</td><td><a href="https://www.scan.co.uk/search?q=ASUS+X870E-I" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>RAM</td><td>32GB (2x16GB) Corsair Vengeance LPX DDR5 6000MHz CL30</td><td><a href="https://www.scan.co.uk/search?q=Corsair+LPX+32GB+6000" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>Storage</td><td>2TB Samsung 990 Pro PCIe 4.0 NVMe SSD</td><td><a href="https://www.scan.co.uk/search?q=Samsung+990+Pro+2TB" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>GPU</td><td>NVIDIA GeForce RTX 5070 12GB (Dual-Slot Model)</td><td><a href="https://www.overclockers.co.uk/search?sSearch=RTX+5070" target="_blank" class="text-cyan-400 hover:underline">Overclockers UK</a></td></tr>
-        <tr><td>Case</td><td>Fractal Design Terra</td><td><a href="https://www.scan.co.uk/search?q=Fractal+Terra" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-        <tr><td>PSU</td><td>Corsair SF850L 850W SFX-L 80+ Gold</td><td><a href="https://www.scan.co.uk/search?q=Corsair+SF850L" target="_blank" class="text-cyan-400 hover:underline">Scan</a></td></tr>
-    </tbody></table></div></div>
-
-    <!-- Info Popout Modals -->
-    <div id="info-modal-container"></div>
-
-    <footer class="mt-12 p-8 text-center text-gray-500 border-t border-gray-800">
-        <p>Project Chimera is a work of fiction. All information is for educational and entertainment purposes.</p>
-        <p class="mt-2 text-sm">Data compiled from open-source intelligence. Secure, Contain, Protect.</p>
-    </footer>
+    <!-- Component Modal -->
+    <div id="component-modal" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal">
+        <div class="modal-content w-full max-w-4xl h-full max-h-[90vh] bg-black rounded-lg shadow-lg flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-[var(--border-color)]">
+                <h2 id="modal-title" class="text-2xl font-bold terminal-glow-cyan"></h2>
+                <button id="modal-close-btn" class="text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            <div id="modal-body" class="p-6 overflow-y-auto">
+                <!-- Modal content will be injected here -->
+            </div>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- INTRO ANIMATION ---
-            const introOverlay = document.getElementById('intro-overlay');
+            // --- Log-on Animation ---
+            const logonContent = document.getElementById('logon-content');
+            const progressBar = document.getElementById('progress-bar');
+            const progressContainer = document.getElementById('progress-container');
+            const logonStatus = document.getElementById('logon-status');
             const mainContent = document.getElementById('main-content');
-            const introTextEl = document.getElementById('intro-text');
-            const introLines = [
-                { text: "BIOS Version 2.1.0.CHIMERA", color: "intro-cmd" },
-                { text: "Initializing USB Controllers...", delay: 200, color: "text-white" },
-                { text: " Done.", color: "intro-ok" },
-                { text: "\nDetecting Storage Devices...", delay: 100, color: "text-white" },
-                { text: "\n  SATA: 1 device(s) found", color: "text-white" },
-                { text: "\n  NVMe: 2 device(s) found", color: "text-white" },
-                { text: "\nMemory Test: 65536MB OK", delay: 300, color: "intro-ok" },
-                { text: "\nCPU: Anomaly-01 Detected - Cores: 8P+16E", color: "intro-cmd" },
-                { text: "\nGPU: Anomaly-02 Detected - VRAM: 32GB GDDR7", color: "intro-cmd" },
-                { text: "\n\n<span class='intro-warn'>WARNING:</span> Anomalous data signature detected in Sector 7G.", delay: 400, color: "intro-warn" },
-                { text: "\n<span class='intro-err'>ERROR:</span> Memetic hazard quarantine failed. get a job frenchie.", delay: 100, color: "intro-err" },
-                { text: "\n<span class='intro-warn'>WARNING:</span> mi-hwa is gay", delay: 50, color: "intro-warn" },
-                { text: "\nBypassing safety protocols...", delay: 500, color: "text-white" },
-                { text: "\nLoading Anomaly Database...", color: "text-white" },
-                { text: "\nNetwork Interface: <span class='intro-ok'>UP</span>", color: "text-white" },
-                { text: "\nAll systems nominal.", delay: 200, color: "intro-ok" },
-                { text: "\n\nAwaiting user input...", delay: 300, color: "text-white" },
-                { text: "\nlogin: O5-Council", delay: 1000, color: "text-white" },
-                { text: "\npassword: ***********", delay: 500, color: "text-white" },
-                { text: "\n\n<span class='intro-ok'>ACCESS GRANTED. Welcome.</span>", delay: 200, color: "intro-ok" },
-                { text: "\nLoading Project Chimera Interface...", delay: 500, color: "text-white" }
+            const logonScreen = document.getElementById('logon-screen');
+
+            const lines = [
+                { text: 'INITIALIZING SYSTEM...', delay: 100 },
+                { text: 'CONNECTING TO [PROJECT_TERMINUS] MAINFR...', delay: 1500, type: true },
+                { text: 'CONNECTION ESTABLISHED.', delay: 500 },
+                { text: 'BYPASSING SECURITY PROTOCOL... ALPHA-7', delay: 1000, type: true },
+                { text: 'ACCESS GRANTED.', delay: 500 },
+                { text: 'LOADING KERNEL MODULES...', delay: 800, progress: 20 },
+                { text: 'DECRYPTING DATA STREAMS...', delay: 1200, progress: 45 },
+                { text: 'Mi-Hwa is so gay, get a job Frenchie', delay: 100, type: true, color: 'text-red-500 flicker' },
+                { text: 'RUNNING DIAGNOSTICS...', delay: 1000, progress: 60 },
+                { text: 'SYSTEM CHECK: OK', delay: 300 },
+                { text: 'CACHE CHECK: OK', delay: 300 },
+                { text: 'Mi-Hwa is a pretty boy', delay: 100, type: true, color: 'text-cyan-400' },
+                { text: 'LOADING USER INTERFACE...', delay: 1500, progress: 85 },
+                { text: 'FINALIZING HANDSHAKE...', delay: 1000, progress: 100 },
+                { text: 'WELCOME, OPERATOR.', delay: 500, type: true, color: 'terminal-glow-cyan text-xl' },
             ];
 
-            let currentText = '';
             let lineIndex = 0;
 
-            function type() {
-                if (lineIndex >= introLines.length) {
-                    introTextEl.innerHTML = currentText; // Remove cursor at the end
+            function processLine() {
+                if (lineIndex >= lines.length) {
                     setTimeout(() => {
-                        introOverlay.style.transition = 'opacity 1s';
-                        introOverlay.style.opacity = '0';
-                        mainContent.style.opacity = '1';
-                        setTimeout(() => introOverlay.style.display = 'none', 1000);
-                    }, 1000);
+                        logonScreen.style.transition = 'opacity 0.5s ease-out';
+                        logonScreen.style.opacity = '0';
+                        mainContent.classList.remove('hidden');
+                        setTimeout(() => logonScreen.remove(), 500);
+                    }, 500);
                     return;
                 }
 
-                const lineInfo = introLines[lineIndex];
-                const line = lineInfo.text;
-                let charIndex = 0;
-
-                function typeChar() {
-                    if (charIndex < line.length) {
-                        currentText += line.charAt(charIndex);
-                        introTextEl.innerHTML = currentText.replace(/<span class="[^"]+">/g, (match) => match).replace(/<\/span>/g, '') + '<span class="cursor"></span>';
-                        charIndex++;
-                        setTimeout(typeChar, 10 + Math.random() * 20);
-                    } else {
-                        currentText = introTextEl.innerHTML.replace('<span class="cursor"></span>', '');
-                        currentText += '\n';
-                        lineIndex++;
-                        setTimeout(type, lineInfo.delay || 50);
-                    }
+                const line = lines[lineIndex];
+                
+                if (line.progress) {
+                    progressContainer.classList.remove('hidden');
+                    progressBar.style.width = `${line.progress}%`;
+                    logonStatus.textContent = line.text;
                 }
-                typeChar();
+
+                const p = document.createElement('p');
+                if(line.color) p.className = line.color;
+
+                if (line.type) {
+                    p.classList.add('typing-effect');
+                    logonContent.appendChild(p);
+                    typewriter(p, line.text, 0, () => setTimeout(processLine, line.delay));
+                } else {
+                    p.textContent = line.text;
+                    logonContent.appendChild(p);
+                    setTimeout(processLine, line.delay);
+                }
+                
+                lineIndex++;
             }
+
+            function typewriter(element, text, i, callback) {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    setTimeout(() => typewriter(element, text, i + 1, callback), 30);
+                } else {
+                    element.classList.remove('typing-effect');
+                    if (callback) callback();
+                }
+            }
+
+            processLine();
+
+            // --- Tab Navigation ---
+            const navButtons = document.querySelectorAll('#main-nav button, #mobile-menu button');
+            const tabs = document.querySelectorAll('.tab-content');
+            const mainNav = document.getElementById('main-nav');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
             
-            if (sessionStorage.getItem('introPlayed')) {
-                 introOverlay.style.display = 'none';
-                 mainContent.style.opacity = '1';
-            } else {
-                type();
-                sessionStorage.setItem('introPlayed', 'true');
-            }
+            // Clone nav items for mobile menu
+            mainNav.querySelectorAll('button').forEach(btn => {
+                const clone = btn.cloneNode(true);
+                clone.classList.add('w-full', 'text-left');
+                mobileMenu.appendChild(clone);
+            });
+            
+            const allNavButtons = document.querySelectorAll('nav button, #mobile-menu button');
 
-            // --- THEME SWITCHER LOGIC ---
-            const themeButtons = document.querySelectorAll('.theme-button');
-            const body = document.body;
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
 
-            function applyTheme(theme) {
-                body.dataset.theme = theme;
-                localStorage.setItem('theme', theme);
-                themeButtons.forEach(btn => {
+            function switchTab(tabId) {
+                tabs.forEach(tab => {
+                    tab.classList.add('hidden');
+                });
+                document.getElementById(tabId).classList.remove('hidden');
+
+                allNavButtons.forEach(btn => {
                     btn.classList.remove('active');
-                    if(btn.dataset.theme === theme) {
+                    if (btn.dataset.tab === tabId) {
                         btn.classList.add('active');
                     }
                 });
+                mobileMenu.classList.add('hidden');
             }
 
-            themeButtons.forEach(button => {
+            allNavButtons.forEach(button => {
                 button.addEventListener('click', () => {
-                    applyTheme(button.dataset.theme);
+                    switchTab(button.dataset.tab);
                 });
             });
 
-            const savedTheme = localStorage.getItem('theme') || 'cyberpunk';
-            applyTheme(savedTheme);
+            // --- Component Data and Modal ---
+            const componentGrid = document.getElementById('component-grid');
+            const modal = document.getElementById('component-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
 
+            const components = [
+                { id: 'cpu', name: 'CPU', desc: 'Central Processing Unit - The Brain', 
+                  details: `
+                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                    <p>Executes instructions from software and hardware. Its performance, governed by clock speed, core count, and IPC (Instructions Per Clock), dictates system responsiveness.</p>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong class="text-green-400">Cores/Threads:</strong> More cores are better for multitasking and content creation. High thread counts improve efficiency.</li>
+                        <li><strong class="text-green-400">Clock Speed (GHz):</strong> Higher clock speed is crucial for single-threaded tasks like gaming.</li>
+                        <li><strong class="text-green-400">Cache (L3):</strong> A large L3 cache significantly boosts gaming performance by reducing latency to system RAM.</li>
+                    </ul>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> VENDORS: INTEL vs AMD</h3>
+                    <p><strong class="text-green-400">Intel:</strong> Traditionally strong single-threaded performance and high clock speeds. Hybrid architecture (P-cores/E-cores) optimizes performance and efficiency.</p>
+                    <p><strong class="text-green-400">AMD:</strong> Offers high core counts at competitive prices. 3D V-Cache technology gives a significant edge in gaming.</p>
+                  `
+                },
+                { id: 'gpu', name: 'GPU', desc: 'Graphics Processing Unit - The Visual Powerhouse',
+                  details: `
+                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                    <p>A specialized processor for rendering images, video, and animations. Its massively parallel architecture makes it ideal for gaming and AI tasks.</p>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong class="text-green-400">VRAM (Video RAM):</strong> Crucial for high resolutions and textures. 8GB is minimum for 1080p, 12-16GB for 1440p/4K.</li>
+                        <li><strong class="text-green-400">Core/Boost Clock:</strong> Higher speeds generally mean better performance.</li>
+                        <li><strong class="text-green-400">Specialized Cores:</strong> NVIDIA's RT Cores (Ray Tracing) and Tensor Cores (AI/DLSS) provide significant advantages in supported games.</li>
+                    </ul>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> VENDORS: NVIDIA vs AMD</h3>
+                    <p><strong class="text-green-400">NVIDIA:</strong> Market leader with superior ray tracing performance and the highly-regarded DLSS upscaling technology.</p>
+                    <p><strong class="text-green-400">AMD:</strong> Competes on price-to-performance, excelling in traditional rasterization. FSR is an open-source upscaling alternative.</p>
+                  `
+                },
+                { id: 'ram', name: 'RAM', desc: 'Random Access Memory - The Workspace',
+                  details: `
+                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                    <p>High-speed volatile memory that acts as a short-term workspace for the CPU. It holds the OS, active applications, and game data for quick access.</p>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong class="text-green-400">Capacity (GB):</strong> 16GB is the sweet spot for gaming. 32GB+ is recommended for heavy multitasking and content creation.</li>
+                        <li><strong class="text-green-400">Speed (MT/s):</strong> Higher speed (e.g., DDR5-6000) provides more bandwidth for the CPU.</li>
+                        <li><strong class="text-green-400">Latency (CL):</strong> Lower CAS Latency is better. True latency is a balance of speed and CL.</li>
+                        <li><strong class="text-green-400">Channels:</strong> Always use two sticks for Dual-Channel mode to double memory bandwidth.</li>
+                    </ul>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> CONFIGURATION:</h3>
+                    <p>Always enable XMP (Intel) or EXPO (AMD) in the BIOS to run RAM at its advertised speed.</p>
+                  `
+                },
+                { id: 'motherboard', name: 'Motherboard', desc: 'The Central Nervous System',
+                  details: `
+                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                    <p>The main circuit board connecting all components. Its chipset dictates compatibility and features like overclocking support, connectivity, and expansion.</p>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY FEATURES:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong class="text-green-400">Form Factor:</strong> ATX, Micro-ATX, Mini-ITX. Must match the case.</li>
+                        <li><strong class="text-green-400">CPU Socket & Chipset:</strong> Must be compatible with your chosen CPU (e.g., LGA 1700 for Intel 14th Gen, AM5 for AMD Ryzen 7000+).</li>
+                        <li><strong class="text-green-400">VRM (Voltage Regulator Module):</strong> A high-quality VRM is crucial for stable power delivery to high-end CPUs, especially when overclocking.</li>
+                        <li><strong class="text-green-400">Connectivity:</strong> Check for necessary PCIe slots, M.2 slots for NVMe SSDs, and rear I/O ports.</li>
+                    </ul>
+                  `
+                },
+                { id: 'psu', name: 'PSU', desc: 'Power Supply Unit - The Heart',
+                  details: `
+                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                    <p>Converts AC wall power to DC power for all PC components. A high-quality PSU is the most critical component for system stability and safety.</p>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY METRICS:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong class="text-green-400">Wattage:</strong> Must be sufficient for all components with 20-30% headroom for peaks and future upgrades. Use a PSU calculator.</li>
+                        <li><strong class="text-green-400">Efficiency (80 Plus):</strong> Gold or Bronze ratings offer the best balance of efficiency and cost, resulting in less wasted heat and electricity.</li>
+                        <li><strong class="text-green-400">Modularity:</strong> Fully-modular PSUs offer the easiest building experience and cleanest cable management.</li>
+                        <li><strong class="text-green-400">Protections:</strong> Ensure the PSU has a full suite of protections (OVP, OCP, SCP, etc.) to safeguard your components.</li>
+                    </ul>
+                    <p class="mt-4 text-red-500 flicker">> CRITICAL WARNING: A low-quality PSU is a system-wide liability. Do not cut costs here.</p>
+                  `
+                },
+                { id: 'storage', name: 'Storage', desc: 'The Long-Term Memory',
+                  details: `
+                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                    <p>Non-volatile storage for your OS, applications, and files. Speed dramatically affects boot times and loading speeds.</p>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> HIERARCHY:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong class="text-green-400">NVMe SSD:</strong> The fastest option, using the PCIe bus. Ideal for the OS and frequently used applications.</li>
+                        <li><strong class="text-green-400">SATA SSD:</strong> Faster than HDDs but limited by the SATA interface. Good for game libraries and secondary storage.</li>
+                        <li><strong class="text-green-400">HDD:</strong> The slowest but most cost-effective option. Best for mass storage of media and archives.</li>
+                    </ul>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> RECOMMENDED STRATEGY:</h3>
+                    <p>Use a hybrid approach: a fast NVMe SSD (500GB-1TB) for your OS and a larger SATA SSD or HDD for bulk data storage.</p>
+                  `
+                },
+                { id: 'case', name: 'Case', desc: 'The Skeleton & Skin',
+                  details: `
+                     <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                    <p>The enclosure that protects and houses all components. Crucial for organization, protection, and cooling.</p>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> KEY CONSIDERATIONS:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong class="text-green-400">Compatibility:</strong> Must support your motherboard's form factor (ATX, mATX, etc.).</li>
+                        <li><strong class="text-green-400">Clearance:</strong> Check manufacturer specs for max CPU cooler height and GPU length. This is a common build error.</li>
+                        <li><strong class="text-green-400">Airflow:</strong> A case with a mesh front panel and multiple fan mounts will provide superior cooling performance.</li>
+                    </ul>
+                  `
+                },
+                { id: 'cooling', name: 'Cooling', desc: 'Thermal Management System',
+                  details: `
+                    <h3 class="text-xl font-bold text-cyan-400 mb-2">> FUNCTION:</h3>
+                    <p>Removes heat from critical components like the CPU and GPU to prevent thermal throttling and ensure peak performance.</p>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> METHODS:</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><strong class="text-green-400">Air Cooling:</strong> Uses a heatsink and fan. High-end air coolers offer excellent price-to-performance and reliability.</li>
+                        <li><strong class="text-green-400">AIO Liquid Cooling:</strong> A sealed liquid loop. Offers superior cooling for high-TDP CPUs and a cleaner aesthetic.</li>
+                    </ul>
+                    <h3 class="text-xl font-bold text-cyan-400 mt-4 mb-2">> AIRFLOW STRATEGY:</h3>
+                    <p>Establish a clear path: intake from the front/bottom, exhaust out the rear/top. A slightly positive pressure (more intake than exhaust CFM) is ideal to minimize dust.</p>
+                  `
+                },
+            ];
 
-            // --- PAGE NAVIGATION LOGIC ---
-            const pageNav = document.getElementById('page-nav');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const pages = document.querySelectorAll('.page');
-            const allNavButtons = document.querySelectorAll('#page-nav .nav-button, #mobile-menu .nav-button');
-
-            function switchPage(pageId) {
-                pages.forEach(page => page.classList.remove('active'));
-                document.getElementById(`page-${pageId}`).classList.add('active');
-
-                allNavButtons.forEach(button => {
-                    button.classList.remove('active');
-                    if (button.dataset.page === pageId) button.classList.add('active');
-                });
-            }
-
-            pageNav.addEventListener('click', (e) => {
-                if (e.target.tagName === 'BUTTON') switchPage(e.target.dataset.page);
+            components.forEach(comp => {
+                const card = document.createElement('div');
+                card.className = 'component-card p-6 rounded-lg cursor-pointer';
+                card.dataset.id = comp.id;
+                card.innerHTML = `
+                    <h3 class="text-2xl font-bold terminal-glow">${comp.name}</h3>
+                    <p class="text-cyan-400">${comp.desc}</p>
+                `;
+                componentGrid.appendChild(card);
             });
-            mobileMenu.addEventListener('click', (e) => {
-                 if (e.target.tagName === 'BUTTON') {
-                    switchPage(e.target.dataset.page);
-                    mobileMenu.classList.add('hidden');
-                }
-            });
-            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
 
-            // --- BUILD MODAL LOGIC ---
-            const modalButtons = document.querySelectorAll('.modal-button');
-            modalButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const modal = document.getElementById(button.dataset.modal);
-                    modal.style.display = "block";
-                });
-            });
-
-            // --- INFO POPOUT MODAL LOGIC ---
-            const infoModalContainer = document.getElementById('info-modal-container');
-            const infoPopouts = document.querySelectorAll('.info-popout');
-            
-            const infoData = {
-                'cpu-cycle-modal': { title: 'Fetch-Decode-Execute Cycle', content: `<p class="mb-4">At its most fundamental level, a CPU's operation is defined by the instruction cycle, a continuous, multi-stage process that it repeats billions of times per second. This cycle can be broken down into three primary stages:</p><ul class="list-disc list-inside space-y-2"><li><strong>Fetch:</strong> The cycle begins with the CPU's Control Unit (CU) retrieving an instruction from RAM. The address of this instruction is held in the Program Counter (PC).</li><li><strong>Decode:</strong> The fetched instruction, in binary code, is translated by the instruction decoder into micro-operations that the CPU's functional units can understand.</li><li><strong>Execute:</strong> The decoded micro-operations are sent to the appropriate execution units, like the Arithmetic Logic Unit (ALU), which handles all mathematical and logical operations.</li><li><strong>Store (Writeback):</strong> After execution, the results are stored, either in a high-speed register within the CPU or back to main system memory.</li></ul>` },
-                'cpu-ipc-modal': { title: 'IPC vs. Clock Speed', content: `<p class="mb-4">Evaluating a CPU's performance requires looking beyond simple marketing numbers. The true computational power is a function of its clock speed, its architectural efficiency (IPC), and its ability to access data quickly (cache).</p><p class="mb-4"><strong>Clock Speed (Frequency):</strong> Measured in Gigahertz (GHz), this represents the number of cycles a CPU's internal clock completes per second. While a higher clock speed is generally faster, this is only true when comparing processors of the same architecture.</p><p><strong>Instructions Per Cycle (IPC):</strong> This is a measure of a CPU's architectural efficiency, representing the average number of instructions it can execute in a single clock cycle. A newer CPU with higher IPC can easily outperform an older CPU with a higher clock speed.</p>` },
-                'cpu-cores-modal': { title: 'Cores, Threads, and Parallelism', content: `<p class="mb-4">Modern CPU performance relies on parallel execution. It's essential to distinguish between a physical core and a logical thread.</p><ul class="list-disc list-inside space-y-2"><li><strong>Core:</strong> A core is a complete, physical processing unit integrated onto the CPU die. A quad-core processor can physically execute four separate instruction streams simultaneously.</li><li><strong>Thread:</strong> A thread is a sequence of programmed instructions managed by an operating system.</li><li><strong>Simultaneous Multithreading (SMT):</strong> Also known as Hyper-Threading (Intel), SMT allows a single physical core to present itself as two logical cores to the OS. When one thread stalls (e.g., waiting for data), the core can immediately switch to the second thread, keeping its execution units busy and increasing throughput.</li><li><strong>Hybrid Architecture (P-cores and E-cores):</strong> Implemented by Intel, this design combines large, powerful Performance-cores (P-cores) for demanding tasks like gaming, with smaller, power-efficient Efficiency-cores (E-cores) for background tasks. This improves overall system responsiveness and power efficiency.</li></ul>` },
-                'cpu-cache-modal': { title: 'CPU Cache Hierarchy', content: `<p class="mb-4">The most significant bottleneck in modern computing is the speed disparity between the CPU and RAM. To bridge this gap, CPUs incorporate a small, extremely fast type of memory called Static RAM (SRAM) directly onto the processor die, known as the CPU cache.</p><p class="mb-4">When the CPU needs data, it checks the cache first. If the data is present (a <strong>cache hit</strong>), it is retrieved almost instantaneously. If not (a <strong>cache miss</strong>), the CPU must stall and wait for the data from the much slower RAM, incurring a significant performance penalty.</p><ul class="list-disc list-inside space-y-2"><li><strong>Level 1 (L1) Cache:</strong> The smallest and fastest level, private to each core.</li><li><strong>Level 2 (L2) Cache:</strong> Larger and slightly slower than L1, usually private to each core.</li><li><strong>Level 3 (L3) Cache:</strong> The largest and slowest cache level, typically shared among all cores. A large L3 cache is vital for reducing traffic to main memory, which is particularly beneficial in data-intensive applications like gaming. This is the principle behind AMD's 3D V-Cache technology.</li></ul>` },
-                'gpu-simd-modal': { title: 'GPU Architecture: SIMD', content: `<p class="mb-4">The fundamental difference between a CPU and a GPU is their design philosophy. A CPU is latency-optimized for serial tasks, while a GPU is throughput-optimized for a massive number of parallel tasks. This is achieved through an architectural model known as <strong>Single Instruction, Multiple Data (SIMD)</strong>.</p><p>An effective analogy is to think of a CPU as a small team of highly-trained chefs, each capable of preparing a complex meal. A GPU, in contrast, is like a vast assembly line with thousands of workers, where each worker performs a single, simple task—like placing a topping on a pizza—over and over again on thousands of pizzas. This massive parallelism is perfectly suited for graphics rendering, where every pixel on a 4K display may require similar calculations for color, lighting, and shading.</p>` },
-                'gpu-rt-modal': { title: 'RT Cores / Ray Accelerators', content: `<p class="mb-4">Real-time ray tracing, which simulates the physical behavior of light to produce photorealistic graphics, is an immensely demanding computational task. To make this feasible in real-time, both NVIDIA and AMD have integrated dedicated hardware accelerators into their GPUs.</p><p>These specialized hardware units (called RT Cores by NVIDIA and Ray Accelerators by AMD) are designed to accelerate the two most computationally intensive parts of ray tracing: Bounding Volume Hierarchy (BVH) traversal and ray-triangle intersection testing. By offloading these specific, repetitive calculations from the general-purpose shader cores, they make real-time ray tracing possible at playable frame rates.</p>` },
-                'gpu-tensor-modal': { title: 'Tensor Cores / AI Accelerators', content: `<p class="mb-4">These are specialized cores designed to dramatically accelerate matrix multiplication and accumulation (MAC) operations, which are the fundamental calculations used in AI and deep learning neural networks.</p><p>Their primary application in gaming is powering AI-driven upscaling technologies like NVIDIA's Deep Learning Super Sampling (DLSS) and AMD's FidelityFX Super Resolution (FSR). These technologies use AI models, running on the dedicated AI hardware, to upscale a lower-resolution rendered image to a higher resolution, or to generate entirely new frames between rendered ones (Frame Generation). This can provide a massive boost to frame rates with minimal perceived loss in image quality.</p>` },
-                'gpu-vram-modal': { title: 'VRAM (Video RAM)', content: `<p class="mb-4">VRAM is a dedicated pool of high-speed GDDR memory on the graphics card that acts as a high-speed buffer for the GPU core, storing critical data like game textures, 3D models, and the framebuffer.</p><ul class="list-disc list-inside space-y-2"><li><strong>Capacity (GB):</strong> The amount of VRAM is critical for high-resolution gaming. If a game's assets exceed the VRAM capacity, the system is forced to swap data with the much slower system RAM, causing severe stuttering and performance degradation. For 1440p gaming, 12GB is recommended, with 16GB or more being ideal for 4K.</li><li><strong>Bandwidth (GB/s):</strong> This is the rate at which data can be transferred between the GPU core and the VRAM. High memory bandwidth is crucial for feeding the thousands of GPU cores with data, especially when rendering complex, high-resolution scenes.</li></ul>` },
-                'mb-vrm-modal': { title: 'Voltage Regulator Module (VRM)', content: `<p class="mb-4">The VRM is arguably the most critical component for system stability. It takes the 12V power from the PSU and refines it into the precise and stable low voltage (~1.2V) that the CPU requires. A high-quality VRM is essential when using a high-power CPU or when overclocking.</p><p>The VRM is constructed from multiple parallel circuits called <strong>power phases</strong>. Distributing the power delivery workload across more phases allows for cleaner, more stable power with less voltage fluctuation ("ripple") and improved thermal performance, preventing the VRM from overheating and throttling the CPU.</p>` },
-                'mb-chipset-modal': { title: 'Motherboard Chipset', content: `<p class="mb-4">The chipset is a collection of integrated circuits that functions as the data traffic controller for the entire system. It manages the flow of information between the CPU and virtually every other component, including RAM, storage drives, and peripherals connected through PCIe and USB.</p><p>The specific chipset on a motherboard determines its feature set, including CPU compatibility, the number and generation of available PCIe lanes, the number of USB/SATA ports, and support for overclocking. Both Intel (Z/B/H series) and AMD (X/B/A series) offer their chipsets in tiers to match different budgets and needs.</p>` },
-                'mb-pcie-modal': { title: 'PCIe Lanes', content: `<p class="mb-4">The Peripheral Component Interconnect Express (PCIe) is the high-speed interface that connects the most performance-critical components, like the GPU and NVMe SSDs, to the CPU. A PCIe connection is built from one or more "lanes."</p><p>A CPU has a limited number of direct PCIe lanes (typically 16-24), which are reserved for the primary x16 GPU slot and primary M.2 SSD slot. All other connectivity is routed through the motherboard's chipset. The chipset communicates with the CPU over its own dedicated link, which has a fixed bandwidth. This creates a potential bottleneck if many high-speed devices are used at once. High-end chipsets offer a wider link to mitigate this.</p>` },
-                'ram-latency-modal': { title: 'Absolute Latency', content: `<p class="mb-4">Beyond raw speed (MT/s), RAM performance is governed by its latency, which is the delay between when a command is sent and when data is available. This is quantified by timings, with CAS Latency (CL) being the most important.</p><p>While lower timings are better, they must be considered with clock speed. True latency, measured in nanoseconds, provides a more accurate comparison. For example, a DDR4-3200 CL16 kit and a DDR5-6000 CL30 kit both have an absolute latency of 10ns, illustrating the crucial trade-off.</p><div class="equation"><pre><code>Absolute Latency (ns) = (CL × 2000) / Data Rate (MT/s)</code></pre></div>` },
-                'ram-ddr5-modal': { title: 'DDR5 vs. DDR4 Architecture', content: `<p class="mb-4">DDR5 is the latest generation of SDRAM, offering significant architectural improvements over DDR4 designed to feed the ever-increasing core counts of modern CPUs.</p><ul class="list-disc list-inside space-y-2"><li><strong>Channel Architecture:</strong> The most significant change. Each DDR5 module features two independent 32-bit sub-channels, whereas a DDR4 module has a single 64-bit channel. This improves memory access efficiency and concurrency.</li><li><strong>Power Management:</strong> DDR5 moves the Power Management IC (PMIC) from the motherboard directly onto the DIMM, allowing for more granular and stable power regulation.</li><li><strong>On-Die ECC:</strong> DDR5 includes On-Die Error Correction Code as a standard feature, improving reliability and stability at high densities and speeds.</li></ul>` },
-                'ram-xmp-modal': { title: 'Memory Profiles (XMP/EXPO)', content: `<p class="mb-4">By default, all RAM runs at a base JEDEC standard speed (e.g., 4800 MT/s for DDR5), not the faster speed advertised on the box. To achieve the advertised speeds and timings, which is technically overclocking, you must enable a pre-tested memory profile stored on the RAM module itself.</p><ul class="list-disc list-inside space-y-2"><li><strong>Intel XMP (Extreme Memory Profile):</strong> The one-click standard used for Intel platforms.</li><li><strong>AMD EXPO (Extended Profiles for Overclocking):</strong> AMD's equivalent to XMP, designed and optimized for Ryzen platforms.</li></ul><p>Enabling the correct profile is a simple one-click setting in the motherboard's BIOS/UEFI and is essential for getting the performance you paid for.</p>` },
-                'storage-protocol-modal': { title: 'Storage Protocols: AHCI vs. NVMe', content: `<p class="mb-4">The performance gap between SATA and NVMe SSDs is not just due to the physical connector but the underlying communication protocol.</p><ul class="list-disc list-inside space-y-2"><li><strong>AHCI (Advanced Host Controller Interface):</strong> Used by SATA, this is a legacy protocol designed for the high latency and sequential nature of spinning hard drives. It supports only a single command queue, which severely bottlenecks the parallelism of modern flash memory.</li><li><strong>NVMe (Non-Volatile Memory Express):</strong> A modern protocol created specifically for flash-based storage connected via the low-latency PCIe bus. It supports up to 64,000 command queues, allowing a multi-core CPU to issue I/O requests simultaneously without contention, dramatically increasing performance.</li></ul>` },
-                'storage-nand-modal': { title: 'NAND Flash Types', content: `<p class="mb-4">The performance, endurance, and cost of an SSD are determined by the type of NAND flash memory it uses, classified by how many bits of data are stored per cell.</p><ul class="list-disc list-inside space-y-2"><li><strong>SLC (Single-Level Cell):</strong> 1 bit/cell. Highest performance, endurance, and cost. Used in enterprise applications.</li><li><strong>TLC (Triple-Level Cell):</strong> 3 bits/cell. The most common type in consumer SSDs, offering a great balance of cost, performance, and endurance, enhanced by caching techniques.</li><li><strong>QLC (Quad-Level Cell):</strong> 4 bits/cell. Highest density and lowest cost, but with lower endurance and sustained write performance. Best suited for read-intensive workloads like game library drives.</li></ul>` },
-                'psu-efficiency-modal': { title: 'PSU Efficiency (80 PLUS)', content: `<p class="mb-4">PSU efficiency is the measure of how much AC power drawn from the wall is successfully converted into usable DC power, with the remainder being lost as heat. A more efficient PSU wastes less energy, generates less heat, and can run quieter.</p><p>The **80 PLUS** certification program rates PSUs based on their efficiency at various load levels. The tiers are:</p><ul class="list-disc list-inside"><li>80 PLUS</li><li>Bronze</li><li>Silver</li><li>Gold (Recommended sweet spot for most builds)</li><li>Platinum</li><li>Titanium</li></ul><p>While not a direct measure of electrical quality, higher efficiency ratings strongly correlate with higher-quality internal components.</p>` },
-                'psu-protections-modal': { title: 'PSU Protection Circuits', content: `<p class="mb-4">A quality PSU includes a suite of protection circuits to safeguard both the PSU and your expensive components from electrical faults. These are non-negotiable features.</p><ul class="list-disc list-inside space-y-2"><li><strong>OVP (Over Voltage Protection):</strong> Shuts down if voltage is too high.</li><li><strong>UVP (Under Voltage Protection):</strong> Shuts down if voltage is too low.</li><li><strong>OCP (Over Current Protection):</strong> Shuts down a rail if current draw is too high.</li><li><strong>OPP (Over Power Protection):</strong> Shuts down if total power draw exceeds its rating.</li><li><strong>SCP (Short Circuit Protection):</strong> Shuts down if a short circuit is detected.</li><li><strong>OTP (Over Temperature Protection):</strong> Shuts down if internal temperature is dangerously high.</li></ul>` },
-                'cooling-air-modal': { title: 'Air Coolers', content: `<p class="mb-4">Traditional air cooling is a reliable, cost-effective, and often highly efficient method for cooling a CPU. It consists of a baseplate, heat pipes, a large aluminum fin stack (the heatsink), and one or more fans.</p><p>Heat from the CPU vaporizes a liquid inside the heat pipes. This vapor travels up to the fins, where fans blow air across them, condensing the vapor back into a liquid, which flows back down to repeat the cycle. Their main advantages are reliability and cost, while their main disadvantage is the bulk and potential clearance issues with tall RAM.</p>` },
-                'cooling-aio-modal': { title: 'AIO Liquid Coolers', content: `<p class="mb-4">All-In-One (AIO) coolers offer the benefits of liquid cooling in a simple, pre-assembled package. An AIO is a closed-loop system consisting of a water block with an integrated pump, tubing, and a radiator with fans.</p><p>The pump circulates coolant, which absorbs heat from the CPU and moves it to the radiator, where it's dissipated into the air. AIOs, particularly larger models (280mm, 360mm), offer superior thermal capacity for high-wattage CPUs and a cleaner aesthetic. Their main drawbacks are higher cost and more potential points of failure (the pump) compared to air coolers.</p>` },
-                'cooling-custom-modal': { title: 'Custom Liquid Cooling', content: `<p class="mb-4">For ultimate performance and aesthetics, enthusiasts turn to custom, open-loop liquid cooling. This involves building a cooling system from individual components: water blocks, a separate pump, a reservoir, one or more radiators, and tubing with fittings.</p><p>A custom loop offers unmatched thermal performance, allowing for near-silent operation even under heavy load. It can also be expanded to cool multiple components like the GPU. However, it is very expensive, complex to build, and requires regular maintenance, making it unsuitable for beginners.</p>` },
-                'cooling-airflow-modal': { title: 'Case Airflow', content: `<p class="mb-4">Effective case airflow is essential for removing heat from the system, regardless of the specific CPU/GPU cooler used. This is managed by case fans and is governed by the concept of air pressure.</p><ul class="list-disc list-inside space-y-2"><li><strong>Positive Pressure:</strong> More intake fans than exhaust fans. This helps to reduce dust buildup as air is forced out of unfiltered cracks and vents.</li><li><strong>Negative Pressure:</strong> More exhaust fans than intake fans. This can lead to more dust being pulled into the case through unfiltered openings.</li><li><strong>Neutral/Balanced Pressure:</strong> An equal amount of intake and exhaust airflow. This is often the ideal for thermal performance, ensuring a steady, directed flow of cool air over components and exhausting hot air efficiently.</li></ul>` },
-            };
-
-            infoPopouts.forEach(popout => {
-                popout.addEventListener('click', (e) => {
-                    e.stopPropagation(); // Prevent the accordion from toggling
-                    const modalId = e.target.dataset.modal;
-                    const data = infoData[modalId];
-                    if (!data) return;
-
-                    const infoModalHTML = `
-                        <div id="${modalId}" class="modal info-modal" style="display: block;">
-                            <div class="modal-content">
-                                <span class="close-button">&times;</span>
-                                <h2 class="scp-title">${data.title}</h2>
-                                <div class="text-sm space-y-4">${data.content}</div>
-                            </div>
-                        </div>
-                    `;
-                    infoModalContainer.innerHTML = infoModalHTML;
-
-                    const newModal = document.getElementById(modalId);
-                    newModal.querySelector('.close-button').addEventListener('click', () => {
-                        newModal.style.display = 'none';
-                    });
-                });
-            });
-            
-            document.addEventListener('click', (event) => {
-                // Close build modals
-                if (event.target.matches('.modal-button')) return;
-                const buildModal = event.target.closest('.modal:not(.info-modal)');
-                if (buildModal && (event.target.matches('.close-button') || event.target === buildModal)) {
-                    buildModal.style.display = 'none';
-                }
-                
-                // Close info modals
-                const infoModal = event.target.closest('.info-modal');
-                 if (infoModal && (event.target.matches('.close-button') || event.target === infoModal)) {
-                    infoModal.style.display = 'none';
-                }
-            });
-
-            // Accordion/Expandable Logic
-            const anomalyHeaders = document.querySelectorAll('.anomaly-header');
-            anomalyHeaders.forEach(header => {
-                header.addEventListener('click', () => {
-                    const content = header.nextElementSibling;
-                    const button = header.querySelector('.expand-button');
-                    const isExpanded = content.style.maxHeight && content.style.maxHeight !== "0px";
-
-                    if (isExpanded) {
-                        content.style.maxHeight = null;
-                        button.textContent = '[+ Expand]';
-                    } else {
-                        content.style.maxHeight = content.scrollHeight + "px";
-                        button.textContent = '[- Collapse]';
+            componentGrid.addEventListener('click', (e) => {
+                const card = e.target.closest('.component-card');
+                if (card) {
+                    const component = components.find(c => c.id === card.dataset.id);
+                    if (component) {
+                        modalTitle.textContent = component.name;
+                        modalBody.innerHTML = component.details;
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
                     }
-                });
+                }
+            });
+
+            modalCloseBtn.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
             });
         });
     </script>
 </body>
 </html>
+
