@@ -170,6 +170,8 @@
             margin-top: 1rem;
             border-radius: 0.5rem;
         }
+        
+        #chipset-secret-trigger { cursor: help; }
 
         /* Flip card styles */
         .flip-card { perspective: 1000px; }
@@ -183,7 +185,7 @@
         #home-terminal {
             background: rgba(0,0,0,0.7);
             border: 1px solid var(--border-color);
-            border-radius: 5px;
+            border-radius: 5px 5px 0 0;
             padding: 10px;
             font-size: 10px;
             overflow: hidden;
@@ -192,6 +194,13 @@
             height: 300px; /* Or adjust as needed */
         }
         #home-terminal p { line-height: 1.2; }
+        #home-terminal-input {
+            background: rgba(0,0,0,0.9);
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            color: var(--terminal-green);
+        }
 
         /* Connection Status */
         #connection-status {
@@ -223,7 +232,7 @@
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 51, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 51, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 51, 0); } }
 
         /* Glitched Page & Text*/
-        .glitch-text, #glitched-page {
+        .glitch-text, #glitched-page, #bsod-page {
             color: var(--terminal-red);
             text-shadow: 2px 2px var(--terminal-cyan);
             animation: glitch-anim 1.5s infinite;
@@ -235,6 +244,14 @@
             60% { transform: translate(-3px, -3px); }
             80% { transform: translate(3px, 3px); }
             100% { transform: translate(0); }
+        }
+
+        #bsod-page {
+            background-color: #0000AA;
+            color: #FFFFFF;
+            font-family: 'Lucida Console', 'Courier New', monospace;
+            text-shadow: none;
+            animation: none;
         }
     </style>
 </head>
@@ -311,7 +328,7 @@
                             <p class="mb-4">Welcome, Operator. Project Terminus is a restricted-access educational node dedicated to the architecture of modern computational hardware. This system provides a comprehensive journey into PC hardware, from foundational principles to advanced assembly and tuning.</p>
                             <p>Navigate via the command tabs. Each module contains interactive data streams and diagrams. Proceed with caution. System integrity is paramount.</p>
                         </div>
-                        <div class="mt-6 border border-[var(--border-color)] p-6 rounded-lg bg-black/20 flicker">
+                        <div id="system-alert-box" class="mt-6 border border-[var(--border-color)] p-6 rounded-lg bg-black/20 flicker cursor-pointer">
                              <h3 class="text-2xl font-bold text-red-500 mb-4">> WARNING: SYSTEM_ALERT</h3>
                              <p>Unusual power fluctuations detected in Sector 7-G. PSU integrity checks recommended for all field operatives. A low-quality power supply is a critical vulnerability. Do not compromise on power delivery systems.</p>
                         </div>
@@ -319,6 +336,10 @@
                     <div id="home-terminal-container">
                         <h3 class="text-xl font-bold terminal-glow-cyan mb-2">> LIVE_DATA_FEED</h3>
                         <div id="home-terminal"></div>
+                        <div class="flex items-center">
+                            <span class="text-green-400 mr-2">></span>
+                            <input type="text" id="home-terminal-input" class="w-full bg-transparent border-none p-1 focus:outline-none" placeholder="Enter command...">
+                        </div>
                     </div>
                 </div>
 
@@ -476,6 +497,21 @@
             <button id="return-btn" class="mt-8 nav-item px-6 py-3 rounded-md text-xl">ATTEMPT_RECONNECT</button>
         </div>
     </div>
+    
+    <!-- BSOD Page -->
+    <div id="bsod-page" class="hidden fixed inset-0 z-50 p-8">
+        <p>A problem has been detected and Terminus has been shut down to prevent damage to the system.</p>
+        <p class="mt-4">KERNEL_DATA_INPAGE_ERROR</p>
+        <p class="mt-4">If this is the first time you've seen this stop error screen, restart the system. If this screen appears again, follow these steps:</p>
+        <p class="mt-2">Check to make sure any new hardware or software is properly installed. If this is a new installation, ask your hardware or software manufacturer for any updates you might need.</p>
+        <p class="mt-2">If problems continue, disable or remove any newly installed hardware or software. Disable BIOS memory options such as caching or shadowing. If you need to use Safe Mode to remove or disable components, restart your system, press F8 to select Advanced Startup Options, and then select Safe Mode.</p>
+        <p class="mt-4">Technical information:</p>
+        <p>*** STOP: 0x0000007A (0xFFFFF880009A9928, 0xFFFFFFFFC000009D, 0xFFFF...)</p>
+        <p class="mt-4">Collecting data for crash dump ...</p>
+        <p>Initializing disk for crash dump ...</p>
+        <p>Beginning dump of physical memory.</p>
+        <p>Dumping physical memory to disk: <span id="bsod-counter">100</span></p>
+    </div>
 
     <!-- Hidden Konami Code Modal -->
     <div id="konami-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal">
@@ -504,6 +540,33 @@
                 <p class="mt-4">Cannot parse data for build [REDACTED].</p>
                 <p>H3ll0? C4n y0u h34r m3? Th3y put m3 in th3 m4ch1n3. Th3 numb3rs, M4s0n, wh4t d0 th3y m34n?</p>
                 <p class="mt-4 text-yellow-400">...the signal is lost.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Directive 7 Modal -->
+    <div id="directive7-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal">
+        <div class="modal-content w-full max-w-lg bg-black rounded-lg shadow-lg flex flex-col text-yellow-400">
+             <div class="flex justify-between items-center p-4 border-b border-[var(--border-color)]">
+                <h2 class="text-2xl font-bold terminal-glow">> DIRECTIVE_7</h2>
+                <button id="directive7-close-btn" class="text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6">
+                <p class="text-lg">> 'Ignorance is bliss.' All further inquiries are logged and will be met with appropriate countermeasures.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chipset Secret Modal -->
+    <div id="chipset-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal">
+        <div class="modal-content w-full max-w-lg bg-black rounded-lg shadow-lg flex flex-col text-yellow-400">
+             <div class="flex justify-between items-center p-4 border-b border-[var(--border-color)]">
+                <h2 class="text-2xl font-bold terminal-glow">> CLASSIFIED: Chipset Vulnerability</h2>
+                <button id="chipset-close-btn" class="text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6">
+                <p class="text-lg flicker">> Intel Management Engine (IME) exploits remain unpatched in 78% of consumer chipsets.</p>
+                <p class="mt-4 text-red-500">A persistent hardware-level backdoor allows for undetectable system monitoring and data exfiltration. Your data is not your own. They are always watching.</p>
             </div>
         </div>
     </div>
@@ -550,12 +613,15 @@
                 { text: 'Compiling Jiang\'s dialect module...', color: 'text-yellow-400' },
                 { text: 'Purging Frenchie\'s job history...', color: 'text-red-500 flicker' },
                 { text: 'initiating simphwa protocol', color: 'text-green-400' },
-                { text: 'frenchie is a bottom', color: 'text-yellow-400 flicker' },
-                { text: 'toph is a bottom', color: 'text-cyan-400' },
-                { text: 'mi-hwa is a bottom', color: 'text-yellow-400 flicker' },
+                { text: 'toph is a nerd', color: 'text-cyan-400' },
+                { text: 'mi-hwa is gay af', color: 'text-yellow-400 flicker' },
                 { text: 'jiang is a side', color: 'text-yellow-400' },
-                { text: 'mimi is a switch', color: 'text-cyan-400' },
                 { text: 'angel is a pillow princess', color: 'text-red-500 flicker' },
+                { text: 'Kiefy finna khs', color: 'text-red-500 flicker'},
+                { text: 'My magnum dong...', color: 'text-green-400'},
+                { text: 'Matt is crying', color: 'text-cyan-400'},
+                { text: 'Hi father!!! <3', color: 'text-yellow-400'},
+                { text: 'scanning for bitches.... [Error: Bitchless]', color: 'text-red-500'},
             ];
             
             // Shuffle the random events
@@ -824,7 +890,7 @@
                                 <text x="100" y="120" font-size="8" fill="var(--diagram-text)" text-anchor="middle">PCIe x16 (GPU)</text>
                                 <rect x="30" y="135" width="80" height="10" fill="var(--diagram-fill)" fill-opacity="0.5" stroke="var(--diagram-stroke)"/>
                                 <text x="70" y="142" font-size="8" fill="var(--diagram-text)" text-anchor="middle">PCIe x1</text>
-                                <rect x="80" y="160" width="40" height="40" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
+                                <rect id="chipset-secret-trigger" x="80" y="160" width="40" height="40" fill="var(--diagram-fill)" fill-opacity="0.2" stroke="var(--diagram-stroke)"/>
                                 <text x="100" y="185" font-size="8" fill="var(--diagram-text)" text-anchor="middle">Chipset</text>
                             </svg>
                         </div>
@@ -967,6 +1033,15 @@
                         modalBody.innerHTML = component.details;
                         modal.classList.remove('hidden');
                         modal.classList.add('flex');
+                        
+                        // Add secret listener after modal is populated
+                        const chipsetTrigger = document.getElementById('chipset-secret-trigger');
+                        if (chipsetTrigger) {
+                            chipsetTrigger.addEventListener('click', () => {
+                                document.getElementById('chipset-modal').classList.remove('hidden');
+                                document.getElementById('chipset-modal').classList.add('flex');
+                            });
+                        }
                     }
                 }
             });
@@ -1185,6 +1260,7 @@
 
             // --- Home Page Terminal ---
             const homeTerminal = document.getElementById('home-terminal');
+            const homeTerminalInput = document.getElementById('home-terminal-input');
             const sideTerminalLines = [
                 "Scanning network protocols...",
                 "Accessing satellite uplink 7...",
@@ -1202,19 +1278,44 @@
                 "User 'Frenchie' access level: 0",
             ];
 
-            setInterval(() => {
-                const p = document.createElement('p');
-                const randomLine = sideTerminalLines[Math.floor(Math.random() * sideTerminalLines.length)];
-                p.textContent = `> ${randomLine}`;
-                
-                const colors = ['text-green-400', 'text-cyan-400', 'text-yellow-400', 'text-red-500'];
-                p.className = colors[Math.floor(Math.random() * colors.length)];
-
-                homeTerminal.prepend(p);
-                if(homeTerminal.children.length > 20) {
+            function addTerminalLine(text, color = 'text-green-400') {
+                 const p = document.createElement('p');
+                 p.textContent = text;
+                 p.className = color;
+                 homeTerminal.prepend(p);
+                 if(homeTerminal.children.length > 30) {
                     homeTerminal.removeChild(homeTerminal.lastChild);
+                 }
+            }
+
+            setInterval(() => {
+                const randomLine = sideTerminalLines[Math.floor(Math.random() * sideTerminalLines.length)];
+                const colors = ['text-green-400', 'text-cyan-400', 'text-yellow-400', 'text-red-500'];
+                const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                addTerminalLine(`> ${randomLine}`, randomColor);
+            }, 2500);
+            
+            homeTerminalInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    const command = e.target.value.toLowerCase();
+                    addTerminalLine(`> ${e.target.value}`, 'text-white');
+                    e.target.value = '';
+
+                    if (command === 'help') {
+                        addTerminalLine("Available commands: [scan anomalies], [clear], [help]", "text-cyan-400");
+                    } else if (command === 'scan anomalies') {
+                        addTerminalLine("Scanning for system anomalies...", "text-yellow-400");
+                        setTimeout(() => addTerminalLine("... 3 anomalies found.", "text-yellow-400"), 500);
+                        setTimeout(() => addTerminalLine("1. Unauthorized 'Simphwa' protocol active.", "text-red-500"), 1000);
+                        setTimeout(() => addTerminalLine("2. Memory block 'backshots' shows signs of tampering.", "text-red-500"), 1500);
+                        setTimeout(() => addTerminalLine("3. Subject 'Mi-Hwa' gayness levels exceed safe parameters.", "text-red-500"), 2000);
+                    } else if (command === 'clear') {
+                        homeTerminal.innerHTML = '';
+                    } else {
+                        addTerminalLine(`Error: Command not found: ${command}`, "text-red-500");
+                    }
                 }
-            }, 2000);
+            });
 
             // --- Hidden Secrets ---
             const mainHeader = document.getElementById('main-header');
@@ -1225,6 +1326,12 @@
             const konamiModal = document.getElementById('konami-modal');
             const konamiCloseBtn = document.getElementById('konami-close-btn');
             const secretChar = document.getElementById('secret-char');
+            const directive7Modal = document.getElementById('directive7-modal');
+            const directive7CloseBtn = document.getElementById('directive7-close-btn');
+            const chipsetModal = document.getElementById('chipset-modal');
+            const chipsetCloseBtn = document.getElementById('chipset-close-btn');
+            const systemAlertBox = document.getElementById('system-alert-box');
+            const bsodPage = document.getElementById('bsod-page');
 
             // Secret 1: Connection Status
             connectionStatus.addEventListener('click', () => {
@@ -1270,7 +1377,13 @@
             
             // Secret 3: Hidden Character
             secretChar.addEventListener('click', () => {
-                alert("Directive 7: 'Ignorance is bliss.' All further inquiries are logged and will be met with appropriate countermeasures.");
+                directive7Modal.classList.remove('hidden');
+                directive7Modal.classList.add('flex');
+            });
+
+            directive7CloseBtn.addEventListener('click', () => {
+                directive7Modal.classList.add('hidden');
+                directive7Modal.classList.remove('flex');
             });
 
             // Secret 4: Header Click
@@ -1289,6 +1402,32 @@
             // Secret 5: Console Log
             console.log("%cSTOP!", "color: red; font-size: 50px; font-weight: bold; text-shadow: 2px 2px black;");
             console.log("%cUnauthorized access detected. Your activity on this node is being monitored. Cease your investigation immediately.", "color: #ff0033; font-size: 14px; font-family: 'Fira Code', monospace;");
+            
+            // Secret 6: Chipset Click
+            chipsetCloseBtn.addEventListener('click', () => {
+                chipsetModal.classList.add('hidden');
+                chipsetModal.classList.remove('flex');
+            });
+
+            // Secret 7: BSOD
+            let alertClicks = 0;
+            systemAlertBox.addEventListener('click', () => {
+                alertClicks++;
+                if (alertClicks >= 15) {
+                    mainContent.classList.add('hidden');
+                    bsodPage.classList.remove('hidden');
+                    let counter = 100;
+                    const bsodCounter = document.getElementById('bsod-counter');
+                    const interval = setInterval(() => {
+                        counter--;
+                        bsodCounter.textContent = counter;
+                        if (counter <= 0) {
+                            clearInterval(interval);
+                            location.reload();
+                        }
+                    }, 50);
+                }
+            });
 
         });
     </script>
