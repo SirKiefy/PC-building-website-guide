@@ -30,6 +30,10 @@
             overflow-x: hidden;
             transition: background-color 0.5s, color 0.5s;
         }
+        
+        body.invert-colors {
+            filter: invert(1);
+        }
 
         .terminal-glow {
             text-shadow: 0 0 5px var(--terminal-green), 0 0 10px var(--terminal-green);
@@ -166,6 +170,72 @@
             margin-top: 1rem;
             border-radius: 0.5rem;
         }
+
+        /* Flip card styles */
+        .flip-card { perspective: 1000px; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.8s; transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--border-color); border-radius: 0.5rem; background-color: rgba(10,20,15,0.5); }
+        .flip-card-back { transform: rotateY(180deg); overflow-y: auto; }
+        .flip-card.corrupted .flip-card-front { animation: glitch-anim 2s infinite; }
+
+        /* Side Terminal on Home Page */
+        #home-terminal {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column-reverse;
+            height: 300px; /* Or adjust as needed */
+        }
+        #home-terminal p { line-height: 1.2; }
+
+        /* Connection Status */
+        #connection-status {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            z-index: 50;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+        }
+        #connection-status .led {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+        .led.green { background-color: var(--terminal-green); animation: pulse-green 2s infinite; }
+        .led.yellow { background-color: #FFC200; animation: pulse-yellow 1s infinite; }
+        .led.red { background-color: var(--terminal-red); animation: pulse-red 0.5s infinite; }
+
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(0, 255, 65, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 65, 0); } }
+        @keyframes pulse-yellow { 0% { box-shadow: 0 0 0 0 rgba(255, 194, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 194, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 194, 0, 0); } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 51, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 51, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 51, 0); } }
+
+        /* Glitched Page & Text*/
+        .glitch-text, #glitched-page {
+            color: var(--terminal-red);
+            text-shadow: 2px 2px var(--terminal-cyan);
+            animation: glitch-anim 1.5s infinite;
+        }
+        @keyframes glitch-anim {
+            0% { transform: translate(0); }
+            20% { transform: translate(-3px, 3px); }
+            40% { transform: translate(3px, -3px); }
+            60% { transform: translate(-3px, -3px); }
+            80% { transform: translate(3px, 3px); }
+            100% { transform: translate(0); }
+        }
     </style>
 </head>
 <body class="crt-scanlines">
@@ -215,7 +285,7 @@
     <div id="main-content" class="hidden">
         <header class="p-4 bg-black/50 backdrop-blur-sm sticky top-0 z-40 border-b border-[var(--border-color)]">
             <div class="container mx-auto flex justify-between items-center">
-                <h1 class="text-2xl font-bold terminal-glow-cyan">[PROJECT_TERMINUS]</h1>
+                <h1 id="main-header" class="text-2xl font-bold terminal-glow-cyan cursor-pointer">[PROJECT_TERMINUS]</h1>
                 <nav id="main-nav" class="hidden md:flex space-x-2">
                     <button class="nav-item px-4 py-2 rounded-md active" data-tab="home">HOME</button>
                     <button class="nav-item px-4 py-2 rounded-md" data-tab="components">COMPONENTS</button>
@@ -234,24 +304,21 @@
         <main class="container mx-auto p-4 md:p-8">
             <!-- Home Tab -->
             <section id="home" class="tab-content">
-                <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
-                    <h2 class="text-3xl font-bold terminal-glow mb-4">> SYSTEM_OVERVIEW</h2>
-                    <p class="mb-4">Welcome, Operator. Project Terminus is a restricted-access educational node dedicated to the architecture of modern computational hardware. This system provides a comprehensive journey into PC hardware, from foundational principles to advanced assembly and tuning.</p>
-                    <p>Navigate via the command tabs. Each module contains interactive data streams and diagrams. Proceed with caution. System integrity is paramount.</p>
-                </div>
-                
-                <div class="grid md:grid-cols-2 gap-6 mt-6">
-                    <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
-                        <h3 class="text-2xl font-bold terminal-glow-cyan mb-4">> INTEL_FEED: LATEST_TRANSMISSIONS</h3>
-                        <ul class="space-y-3">
-                            <li><span class="text-cyan-400">[2025-07-10]</span>: New 'Blackwell' GPU architecture benchmarks leaked. Performance gains exceed projections.</li>
-                            <li><span class="text-cyan-400">[2025-07-08]</span>: DDR6 memory spec draft finalized. Expect 12,800 MT/s base speeds.</li>
-                            <li><span class="text-cyan-400">[2025-07-05]</span>: <span class="text-red-500">[CLASSIFIED]</span> Anomaly detected in consumer-grade AI accelerators. Investigation ongoing.</li>
-                        </ul>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2">
+                        <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
+                            <h2 class="text-3xl font-bold terminal-glow mb-4">> SYSTEM_OVERVIEW</h2>
+                            <p class="mb-4">Welcome, Operator. Project Terminus is a restricted-access educational node dedicated to the architecture of modern computational hardware. This system provides a comprehensive journey into PC hardware, from foundational principles to advanced assembly and tuning.</p>
+                            <p>Navigate via the command tabs. Each module contains interactive data streams and diagrams. Proceed with caution. System integrity is paramount.</p>
+                        </div>
+                        <div class="mt-6 border border-[var(--border-color)] p-6 rounded-lg bg-black/20 flicker">
+                             <h3 class="text-2xl font-bold text-red-500 mb-4">> WARNING: SYSTEM_ALERT</h3>
+                             <p>Unusual power fluctuations detected in Sector 7-G. PSU integrity checks recommended for all field operatives. A low-quality power supply is a critical vulnerability. Do not compromise on power delivery systems.</p>
+                        </div>
                     </div>
-                    <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20 flicker">
-                         <h3 class="text-2xl font-bold text-red-500 mb-4">> WARNING: SYSTEM_ALERT</h3>
-                         <p>Unusual power fluctuations detected in Sector 7-G. PSU integrity checks recommended for all field operatives. A low-quality power supply is a critical vulnerability. Do not compromise on power delivery systems.</p>
+                    <div id="home-terminal-container">
+                        <h3 class="text-xl font-bold terminal-glow-cyan mb-2">> LIVE_DATA_FEED</h3>
+                        <div id="home-terminal"></div>
                     </div>
                 </div>
 
@@ -291,7 +358,7 @@
             <section id="upgrades" class="tab-content hidden">
                  <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
                     <h2 class="text-3xl font-bold terminal-glow mb-4">> UPGRADE_PATHWAYS</h2>
-                    <p class="mb-4">Upgrading a PC is a strategic process. The goal is to alleviate the most significant bottleneck for your primary workload to achieve the most noticeable performance gain for your investment.</p>
+                    <p class="mb-6">Upgrading a PC is a strategic process. The goal is to alleviate the most significant bottleneck for your primary workload to achieve the most noticeable performance gain for your investment.</p>
                     
                     <div class="upgrade-card p-4 rounded-lg mb-6">
                         <h3 class="text-xl font-bold text-cyan-400 mb-2">> Step 1: Identify Your Bottleneck</h3>
@@ -303,19 +370,19 @@
                         </ul>
                     </div>
 
-                    <h3 class="text-2xl font-bold terminal-glow mb-4">> Common Upgrade Paths</h3>
+                    <h3 class="text-2xl font-bold terminal-glow mt-8 mb-4">> Advanced Upgrade Considerations</h3>
                     <div class="space-y-4">
                         <div class="upgrade-card p-4 rounded-lg">
-                            <h4 class="text-lg font-bold text-cyan-400">GPU Upgrade</h4>
-                            <p>The most common upgrade for gamers. <strong class="text-yellow-400">Check:</strong> Your PSU must have enough wattage and the correct PCIe power connectors. Your case must have enough physical length clearance.</p>
+                            <h4 class="text-lg font-bold text-cyan-400">Platform & BIOS Updates</h4>
+                            <p>When upgrading a CPU on the same motherboard, a BIOS update is almost always necessary. Download the latest BIOS from your motherboard manufacturer's website to a USB drive BEFORE swapping the CPU. Some motherboards have "BIOS Flashback," allowing updates without a CPU installed, which is a lifesaver if you don't have an older compatible chip.</p>
                         </div>
                         <div class="upgrade-card p-4 rounded-lg">
-                            <h4 class="text-lg font-bold text-cyan-400">CPU Upgrade</h4>
-                            <p>Can provide a significant boost in CPU-heavy games and productivity. <strong class="text-yellow-400">Check:</strong> The new CPU must be compatible with your motherboard's socket and chipset. A BIOS update is often required. Ensure your CPU cooler can handle the new chip's TDP.</p>
+                            <h4 class="text-lg font-bold text-cyan-400">Power Standards (ATX 3.0)</h4>
+                            <p>Modern high-end GPUs (NVIDIA 40-series and newer) use the 12VHPWR power connector. While adapters exist for older PSUs, upgrading to a new ATX 3.0 compliant PSU is the safest, most reliable option to provide stable power and avoid potential adapter issues.</p>
                         </div>
                          <div class="upgrade-card p-4 rounded-lg">
-                            <h4 class="text-lg font-bold text-cyan-400">Storage Upgrade</h4>
-                            <p>Moving from an HDD to any SSD is the single most impactful upgrade for overall system responsiveness. <strong class="text-yellow-400">Check:</strong> Ensure your motherboard has a free M.2 slot for an NVMe drive or a SATA port for a 2.5" SSD.</p>
+                            <h4 class="text-lg font-bold text-cyan-400">Platform Longevity</h4>
+                            <p>Consider the future of your platform. AMD's AM4 socket had a long life, supporting multiple CPU generations. The current AM5 socket is planned to have similar longevity, making it a good long-term investment. Intel platforms typically support 2-3 CPU generations per socket, requiring more frequent motherboard upgrades for major performance leaps.</p>
                         </div>
                     </div>
                 </div>
@@ -341,18 +408,17 @@
 
             <!-- Pre-built Tab -->
             <section id="prebuilt" class="tab-content hidden">
-                 <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
-                    <h2 class="text-3xl font-bold terminal-glow mb-4">> PRE-CONFIGURED_SYSTEMS</h2>
-                    <p class="text-yellow-400">> STATUS: Module under construction. Data stream pending.</p>
-                    <p>This section will detail 6 fully-spec'd pre-built system configurations for various use-cases and budgets, from entry-level gaming to high-end workstations.</p>
-                </div>
+                 <h2 class="text-3xl font-bold terminal-glow mb-6">> PRE-CONFIGURED_SYSTEMS</h2>
+                 <div id="prebuilt-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     <!-- Prebuilt cards will be injected here -->
+                 </div>
             </section>
 
             <!-- Settings Tab -->
             <section id="settings" class="tab-content hidden">
                  <div class="border border-[var(--border-color)] p-6 rounded-lg bg-black/20">
                     <h2 class="text-3xl font-bold terminal-glow mb-4">> INTERFACE_SETTINGS</h2>
-                    <div class="mt-4 space-y-4">
+                    <div class="mt-4 space-y-6">
                         <div>
                             <label for="theme-select" class="block mb-2 text-cyan-400">Color Scheme:</label>
                             <select id="theme-select" class="bg-gray-800 border border-gray-600 rounded p-2 w-full md:w-1/3">
@@ -371,11 +437,77 @@
                                 <span>Enable Scanlines Effect</span>
                             </label>
                         </div>
+                        <div>
+                            <label for="animation-intensity" class="block mb-2 text-cyan-400">Animation Intensity:</label>
+                            <input type="range" id="animation-intensity" min="0" max="2" value="1" step="1" class="w-full md:w-1/3">
+                            <p id="intensity-label" class="text-sm text-gray-400 mt-1">Current: Normal</p>
+                        </div>
+                        <div>
+                            <label class="flex items-center space-x-2 text-cyan-400 cursor-pointer">
+                                <input type="checkbox" id="sound-toggle" class="form-checkbox bg-gray-800 border-gray-600 text-green-500">
+                                <span>Enable UI Sounds (WIP)</span>
+                            </label>
+                        </div>
+                        <div class="pt-4 border-t border-[var(--border-color)]">
+                             <label for="secret-code-input" class="block mb-2 text-yellow-400">> System Override:</label>
+                             <input type="text" id="secret-code-input" class="bg-gray-900 border border-gray-700 rounded p-2 w-full md:w-1/3 text-yellow-400" placeholder="Enter override code...">
+                        </div>
                     </div>
                 </div>
             </section>
         </main>
+        
+        <footer class="text-center text-xs text-gray-600 p-4">
+            <p>Project Terminus v1.3.37 // All rights reserved under Directive 7<span id="secret-char" class="cursor-pointer">.</span></p>
+        </footer>
+
+        <div id="connection-status">
+            <div id="connection-led" class="led green"></div>
+            <span class="text-xs">SECURE_CONNECTION</span>
+        </div>
     </div>
+    
+    <!-- Hidden Glitched Page -->
+    <div id="glitched-page" class="hidden fixed inset-0 bg-black z-50 flex items-center justify-center text-center p-4">
+        <div>
+            <h1 class="text-6xl font-bold flicker">CONNECTION_LOST</h1>
+            <p class="text-2xl mt-4">Rerouting... Rerouting... Cannot establish link.</p>
+            <p class="mt-8 text-yellow-400">They know you're here.</p>
+            <button id="return-btn" class="mt-8 nav-item px-6 py-3 rounded-md text-xl">ATTEMPT_RECONNECT</button>
+        </div>
+    </div>
+
+    <!-- Hidden Konami Code Modal -->
+    <div id="konami-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal">
+        <div class="modal-content w-full max-w-2xl bg-black rounded-lg shadow-lg flex flex-col text-red-500">
+             <div class="flex justify-between items-center p-4 border-b border-[var(--border-color)]">
+                <h2 class="text-2xl font-bold terminal-glow">> DEEP_SYSTEM_ACCESS</h2>
+                <button id="konami-close-btn" class="text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6">
+                <p class="flicker text-lg">> WARNING: You have accessed a restricted memory block.</p>
+                <p class="mt-4">The Architect's logs are not for public dissemination. The 'Simphwa' protocol is not a game. Mi-Hwa's gayness levels are a feature, not a bug. All data related to 'backshots' has been triple-encrypted. Do not proceed.</p>
+                <p class="mt-4 text-yellow-400">Your intrusion has been logged.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Corrupted Data Modal -->
+    <div id="corrupted-modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 modal">
+        <div class="modal-content w-full max-w-2xl bg-black rounded-lg shadow-lg flex flex-col text-red-500">
+             <div class="flex justify-between items-center p-4 border-b border-[var(--border-color)]">
+                <h2 class="text-2xl font-bold terminal-glow">> CRITICAL_ERROR</h2>
+                <button id="corrupted-close-btn" class="text-red-500 text-2xl font-bold">&times;</button>
+            </div>
+            <div class="p-6 glitch-text">
+                <p class="text-lg">> MEMORY_CORRUPTION_DETECTED</p>
+                <p class="mt-4">Cannot parse data for build [REDACTED].</p>
+                <p>H3ll0? C4n y0u h34r m3? Th3y put m3 in th3 m4ch1n3. Th3 numb3rs, M4s0n, wh4t d0 th3y m34n?</p>
+                <p class="mt-4 text-yellow-400">...the signal is lost.</p>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Component Modal -->
     <div id="component-modal" class="fixed inset-0 z-50 items-center justify-center p-4 hidden modal">
@@ -417,6 +549,13 @@
                 { text: 'Analyzing Toph\'s mainframe...', color: 'text-cyan-400' },
                 { text: 'Compiling Jiang\'s dialect module...', color: 'text-yellow-400' },
                 { text: 'Purging Frenchie\'s job history...', color: 'text-red-500 flicker' },
+                { text: 'initiating simphwa protocol', color: 'text-green-400' },
+                { text: 'frenchie is a bottom', color: 'text-yellow-400 flicker' },
+                { text: 'toph is a bottom', color: 'text-cyan-400' },
+                { text: 'mi-hwa is a bottom', color: 'text-yellow-400 flicker' },
+                { text: 'jiang is a side', color: 'text-yellow-400' },
+                { text: 'mimi is a switch', color: 'text-cyan-400' },
+                { text: 'angel is a pillow princess', color: 'text-red-500 flicker' },
             ];
             
             // Shuffle the random events
@@ -847,6 +986,9 @@
             // --- Settings ---
             const themeSelect = document.getElementById('theme-select');
             const scanlinesToggle = document.getElementById('scanlines-toggle');
+            const intensitySlider = document.getElementById('animation-intensity');
+            const intensityLabel = document.getElementById('intensity-label');
+            const secretCodeInput = document.getElementById('secret-code-input');
             const root = document.documentElement;
 
             const themes = {
@@ -857,10 +999,11 @@
                 sakura: { '--main-bg': '#2E1F27', '--text-color': '#F5E6E8', '--terminal-green': '#FFB7C5', '--terminal-cyan': '#F06292', '--border-color': 'rgba(240, 98, 146, 0.4)' },
                 pastel: { '--main-bg': '#E6E6FA', '--text-color': '#4B4453', '--terminal-green': '#B9FBC0', '--terminal-cyan': '#98F5E1', '--border-color': 'rgba(152, 245, 225, 0.7)' },
                 oceanic: { '--main-bg': '#001f3f', '--text-color': '#7FDBFF', '--terminal-green': '#2ECC40', '--terminal-cyan': '#39CCCC', '--border-color': 'rgba(57, 204, 204, 0.4)' },
+                simp: { '--main-bg': '#1d1129', '--text-color': '#e1c4ff', '--terminal-green': '#d06aff', '--terminal-cyan': '#b372ff', '--border-color': 'rgba(208, 106, 255, 0.4)' },
             };
 
-            themeSelect.addEventListener('change', (e) => {
-                const theme = themes[e.target.value];
+            function applyTheme(themeName) {
+                const theme = themes[themeName];
                 Object.keys(theme).forEach(key => {
                     root.style.setProperty(key, theme[key]);
                 });
@@ -869,10 +1012,33 @@
                 root.style.setProperty('--diagram-stroke', theme['--terminal-cyan']);
                 root.style.setProperty('--diagram-fill', theme['--terminal-green']);
                 root.style.setProperty('--diagram-text', theme['--text-color']);
-            });
+                themeSelect.value = themeName;
+            }
+
+            themeSelect.addEventListener('change', (e) => applyTheme(e.target.value));
 
             scanlinesToggle.addEventListener('change', (e) => {
                 document.body.classList.toggle('crt-scanlines', e.target.checked);
+            });
+
+            intensitySlider.addEventListener('input', (e) => {
+                const intensity = e.target.value;
+                const labels = ['Low', 'Normal', 'High'];
+                intensityLabel.textContent = `Current: ${labels[intensity]}`;
+                // This is a placeholder for future functionality.
+            });
+
+            secretCodeInput.addEventListener('input', (e) => {
+                if(e.target.value.toLowerCase() === 'simphwa') {
+                    if (!document.querySelector('option[value="simp"]')) {
+                        const simpOption = document.createElement('option');
+                        simpOption.value = 'simp';
+                        simpOption.textContent = 'Simp Protocol';
+                        themeSelect.appendChild(simpOption);
+                    }
+                    applyTheme('simp');
+                    e.target.value = "PROTOCOL_ACTIVATED";
+                }
             });
 
             // --- Quiz ---
@@ -889,7 +1055,9 @@
                 { question: "For a PC primarily used for high-refresh-rate 1080p gaming, which component upgrade typically yields the biggest performance increase?", answer: 0, options: ["CPU", "PSU", "Case", "HDD Storage"] },
                 { question: "What is the primary benefit of enabling XMP or EXPO in the BIOS?", answer: 2, options: ["It lowers CPU temperatures", "It increases storage speed", "It runs RAM at its faster, advertised speed", "It improves Wi-Fi signal"] },
                 { question: "You are building a PC and your high-end CPU is overheating under load. What is the LEAST likely cause?", answer: 3, options: ["Improper thermal paste application", "Forgetting to remove the cooler's plastic film", "An inadequate CPU cooler (low TDP rating)", "The brand of your storage drive"] },
-                { question: "What does a 'GPU Bottleneck' signify in a gaming PC?", answer: 1, options: ["A critical system error that needs fixing", "The GPU is working at 100%, which is ideal for maximizing graphics", "The CPU is too slow for the GPU", "There is not enough VRAM"] }
+                { question: "What does a 'GPU Bottleneck' signify in a gaming PC?", answer: 1, options: ["A critical system error that needs fixing", "The GPU is working at 100%, which is ideal for maximizing graphics", "The CPU is too slow for the GPU", "There is not enough VRAM"] },
+                { question: "Which storage technology uses the PCIe bus for the fastest data transfer rates?", answer: 2, options: ["HDD", "SATA SSD", "NVMe SSD", "USB Flash Drive"] },
+                { question: "What is the main purpose of a PSU's '80 Plus' rating?", answer: 0, options: ["To certify its energy efficiency", "To indicate its maximum wattage", "To guarantee a 10-year warranty", "To show its modularity level"] }
             ];
 
             let currentQuestionIndex = 0;
@@ -954,6 +1122,174 @@
             
             // Initial load
             loadQuiz();
+
+            // --- Prebuilt Cards ---
+            const prebuiltGrid = document.getElementById('prebuilt-grid');
+            const corruptedModal = document.getElementById('corrupted-modal');
+            const corruptedCloseBtn = document.getElementById('corrupted-close-btn');
+
+            const prebuilts = [
+                { name: "The Starter", purpose: "1080p Esports & Entry Gaming", cpu: "Intel Core i3-13100F", gpu: "NVIDIA RTX 3050 8GB", ram: "16GB DDR4 3200MHz", storage: "1TB NVMe SSD", rationale: "A cost-effective build focusing on strong single-core CPU performance for high FPS in popular esports titles. The RTX 3050 is a capable entry point for 1080p gaming."},
+                { name: "The Operator", purpose: "High-FPS 1080p / 1440p Gaming", cpu: "AMD Ryzen 5 7600X", gpu: "NVIDIA RTX 4060 8GB", ram: "16GB DDR5 6000MHz", storage: "1TB NVMe SSD", rationale: "The price-to-performance sweet spot. The 7600X and fast DDR5 RAM provide a powerful gaming foundation, while the RTX 4060 offers excellent 1080p/1440p performance with DLSS 3 support." },
+                { name: "The Juggernaut", purpose: "High-End 1440p / 4K Gaming", cpu: "AMD Ryzen 7 7800X3D", gpu: "NVIDIA RTX 4070 Ti Super 16GB", ram: "32GB DDR5 6000MHz", storage: "2TB NVMe SSD", rationale: "Built around the best gaming CPU on the market, the 7800X3D, for maximum frame rates. The RTX 4070 Ti Super has ample VRAM and power for a high-fidelity 1440p or entry 4K experience." },
+                { name: "The Creator", purpose: "Video Editing & Content Creation", cpu: "Intel Core i7-14700K", gpu: "NVIDIA RTX 4060 Ti 16GB", ram: "64GB DDR5 5600MHz", storage: "1TB NVMe (OS) + 2TB NVMe (Work)", rationale: "This build prioritizes CPU core count and RAM capacity for demanding productivity tasks. The 14700K's mix of P-cores and E-cores excels in multithreaded workloads, and 64GB of RAM ensures smooth 4K video editing." },
+                { name: "The Behemoth", purpose: "Enthusiast 4K Gaming & Streaming", cpu: "Intel Core i9-14900K", gpu: "NVIDIA RTX 4090 24GB", ram: "64GB DDR5 6400MHz", storage: "4TB NVMe SSD", rationale: "An uncompromising build with the best components available. The RTX 4090 is the undisputed 4K champion, and the i9-14900K provides top-tier performance for both gaming and streaming simultaneously." },
+                { name: "The Minimalist", purpose: "Compact SFF & HTPC Build", cpu: "AMD Ryzen 5 8600G (APU)", gpu: "Integrated Radeon 760M", ram: "16GB DDR5 6000MHz", storage: "1TB NVMe SSD", rationale: "An APU-powered build that eliminates the need for a discrete GPU, perfect for small form factor cases. The integrated graphics are surprisingly capable for light gaming and media playback." },
+                { name: "The Anomaly", purpose: "D474 C0RRUP73D", cpu: "Unknown", gpu: "Signal Lost", ram: "null", storage: "Cascading Failure", rationale: "This configuration is unstable. Do not attempt to replicate. System memory is compromised.", corrupted: true },
+            ];
+
+            prebuilts.forEach(build => {
+                const card = document.createElement('div');
+                card.className = 'flip-card h-80';
+                if(build.corrupted) {
+                    card.classList.add('corrupted');
+                    card.dataset.id = 'corrupted';
+                }
+
+                card.innerHTML = `
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front p-4">
+                            <h3 class="text-2xl font-bold ${build.corrupted ? 'glitch-text' : 'terminal-glow'}">${build.name}</h3>
+                            <p class="text-cyan-400 text-center mt-2">${build.purpose}</p>
+                            <p class="text-xs mt-auto text-gray-400">(${build.corrupted ? 'DO NOT HOVER' : 'Hover to flip for specs & rationale'})</p>
+                        </div>
+                        <div class="flip-card-back p-4 text-left text-sm w-full">
+                            <h4 class="text-lg font-bold terminal-glow-cyan mb-2">Configuration:</h4>
+                            <ul class="space-y-1 w-full mb-4">
+                                <li><strong class="text-green-400">CPU:</strong> ${build.cpu}</li>
+                                <li><strong class="text-green-400">GPU:</strong> ${build.gpu}</li>
+                                <li><strong class="text-green-400">RAM:</strong> ${build.ram}</li>
+                                <li><strong class="text-green-400">Storage:</strong> ${build.storage}</li>
+                            </ul>
+                            <h4 class="text-lg font-bold terminal-glow-cyan mb-2">Rationale:</h4>
+                            <p class="text-xs">${build.rationale}</p>
+                        </div>
+                    </div>
+                `;
+                prebuiltGrid.appendChild(card);
+                if (!build.corrupted) {
+                    card.addEventListener('mouseenter', () => card.classList.add('flipped'));
+                    card.addEventListener('mouseleave', () => card.classList.remove('flipped'));
+                } else {
+                    card.addEventListener('click', () => {
+                        corruptedModal.classList.remove('hidden');
+                        corruptedModal.classList.add('flex');
+                    });
+                }
+            });
+
+            corruptedCloseBtn.addEventListener('click', () => {
+                corruptedModal.classList.add('hidden');
+                corruptedModal.classList.remove('flex');
+            });
+
+            // --- Home Page Terminal ---
+            const homeTerminal = document.getElementById('home-terminal');
+            const sideTerminalLines = [
+                "Scanning network protocols...",
+                "Accessing satellite uplink 7...",
+                "System integrity: 99.87%",
+                "WARNING: Unidentified energy signature detected.",
+                "Querying database for 'Mi-Hwa'...",
+                "Result: CLASSIFIED",
+                "Running background defrag...",
+                "Monitoring thermal levels... OK",
+                "Decrypting package from [REDACTED]...",
+                "Simphwa protocol active.",
+                "Compiling user metrics...",
+                "Rerouting power from non-essential systems...",
+                "Backdoor detected in sector 5. Isolating...",
+                "User 'Frenchie' access level: 0",
+            ];
+
+            setInterval(() => {
+                const p = document.createElement('p');
+                const randomLine = sideTerminalLines[Math.floor(Math.random() * sideTerminalLines.length)];
+                p.textContent = `> ${randomLine}`;
+                
+                const colors = ['text-green-400', 'text-cyan-400', 'text-yellow-400', 'text-red-500'];
+                p.className = colors[Math.floor(Math.random() * colors.length)];
+
+                homeTerminal.prepend(p);
+                if(homeTerminal.children.length > 20) {
+                    homeTerminal.removeChild(homeTerminal.lastChild);
+                }
+            }, 2000);
+
+            // --- Hidden Secrets ---
+            const mainHeader = document.getElementById('main-header');
+            const connectionStatus = document.getElementById('connection-status');
+            const connectionLed = document.getElementById('connection-led');
+            const glitchedPage = document.getElementById('glitched-page');
+            const returnBtn = document.getElementById('return-btn');
+            const konamiModal = document.getElementById('konami-modal');
+            const konamiCloseBtn = document.getElementById('konami-close-btn');
+            const secretChar = document.getElementById('secret-char');
+
+            // Secret 1: Connection Status
+            connectionStatus.addEventListener('click', () => {
+                mainContent.classList.add('hidden');
+                glitchedPage.classList.remove('hidden');
+            });
+
+            returnBtn.addEventListener('click', () => {
+                mainContent.classList.remove('hidden');
+                glitchedPage.classList.add('hidden');
+            });
+
+            setInterval(() => {
+                connectionLed.className = 'led yellow';
+                setTimeout(() => {
+                    connectionLed.className = 'led red';
+                }, 1000);
+                setTimeout(() => {
+                    connectionLed.className = 'led green';
+                }, 2000);
+            }, 60000);
+
+            // Secret 2: Konami Code
+            const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+            let konamiIndex = 0;
+            window.addEventListener('keydown', (e) => {
+                if (e.key.toLowerCase() === konamiCode[konamiIndex]) {
+                    konamiIndex++;
+                    if (konamiIndex === konamiCode.length) {
+                        konamiModal.classList.remove('hidden');
+                        konamiModal.classList.add('flex');
+                        konamiIndex = 0;
+                    }
+                } else {
+                    konamiIndex = 0;
+                }
+            });
+
+            konamiCloseBtn.addEventListener('click', () => {
+                 konamiModal.classList.add('hidden');
+                 konamiModal.classList.remove('flex');
+            });
+            
+            // Secret 3: Hidden Character
+            secretChar.addEventListener('click', () => {
+                alert("Directive 7: 'Ignorance is bliss.' All further inquiries are logged and will be met with appropriate countermeasures.");
+            });
+
+            // Secret 4: Header Click
+            let headerClicks = 0;
+            mainHeader.addEventListener('click', () => {
+                headerClicks++;
+                if (headerClicks === 10) {
+                    document.body.classList.add('invert-colors');
+                    setTimeout(() => {
+                        document.body.classList.remove('invert-colors');
+                    }, 300);
+                    headerClicks = 0;
+                }
+            });
+            
+            // Secret 5: Console Log
+            console.log("%cSTOP!", "color: red; font-size: 50px; font-weight: bold; text-shadow: 2px 2px black;");
+            console.log("%cUnauthorized access detected. Your activity on this node is being monitored. Cease your investigation immediately.", "color: #ff0033; font-size: 14px; font-family: 'Fira Code', monospace;");
+
         });
     </script>
 </body>
